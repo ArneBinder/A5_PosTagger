@@ -6,13 +6,17 @@
  * To change this template use File | Settings | File Templates.
  */
 public class TagSet {
-	public final int tagBound = 128;
-	public final int tagBoundBitCount = 8;
+	public static final int tagBound = 128;
+	public static final int tagBoundBitCount = 8;
 
 	/**
 	 * tagMap contains a mapping from tag strings to byte indices (Attention: 1 .. (tagBound-1))
 	 */
 	private BidiMap<String, Byte> tagMap = new BidiMap<String, Byte>();
+
+	public int size(){
+		return tagMap.size();
+	}
 
 	/**
 	 * @param tagString have to be structured like "tagA/tagB/tagC/" don't forget the last slash!

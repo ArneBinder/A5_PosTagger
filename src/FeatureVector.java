@@ -9,7 +9,7 @@ import java.util.HashMap;
  */
 public class FeatureVector {
 	public String[] features;
-	public static final int size = 4;
+	public static final byte size = 4; // ATTENTION: does not exceed 128
 	FeatureVector(){
 		this.features = new String[size];
 	}
