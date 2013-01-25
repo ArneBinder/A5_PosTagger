@@ -1,3 +1,6 @@
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +18,8 @@ public class HMM {
 	 * - transitionProbs
 	 * - emissionProbs
 	 */
-	HashMap<Long, Integer> transitionCounts;
+	//HashMap<Long, Integer> transitionCounts;
+	Multiset<Long> transitionCounts;
 	int totalTransitions;
 	// emissionCounts;
 	int totalEmissions;
@@ -32,24 +36,26 @@ public class HMM {
 	 * write model (to file)
 	 */
 	public void train(Corpus corpus, int gramCount, TagSet tagSet) {
-		assert gramCount < 8 : "max qGram size is 7.";
-		transitionCounts = new HashMap<Long, Integer>();//(gramCount)
+		assert gramCount <= Helper.maxGramCount : "max qGram size is "+Helper.maxGramCount+".";
+		transitionCounts = HashMultiset.create();//new HashMap<Long, Integer>();//(gramCount)
 		totalTransitions = 0;
 		totalEmissions = 0;
+
 		long tagGram = 0;
 		for (Sentence sentence : corpus.getContent()) {
 			for (int i = 0; i < sentence.length(); i++) {
 				totalTransitions++;
 
 				//System.out.println(Helper.tagGramToString(sentence.getPrevTagsCoded(i,3)));
+				tagGram &= Helper.gramMask.get(gramCount);
 				tagGram <<= tagSet.tagBoundBitCount;
-				tagGram &= Helper.gramMask.get(gramCount+1);
 				tagGram += sentence.getTag(i);
-				//System.out.println(Helper.tagGramToString(tagGram) + ": " + Helper.tagGramToString(sentence.getTag(i)));
-				if (!transitionCounts.containsKey(tagGram))
-					transitionCounts.put(tagGram, 1);
-				else
-					transitionCounts.put(tagGram, transitionCounts.get(tagGram)+1);
+				System.out.println(tagSet.tagGramToString(tagGram) + ": " + tagSet.tagGramToString(sentence.getTag(i)));
+				transitionCounts.add(tagGram);
+				//if (!transitionCounts.containsKey(tagGram))
+				//	transitionCounts.put(tagGram, 1);
+				//else
+				//	transitionCounts.put(tagGram, transitionCounts.get(tagGram)+1);
 
 				////
 				// TODO: Features des aktuellen Wortes extrahieren & (gramTag --> Features) zaehlen
@@ -60,14 +66,17 @@ public class HMM {
 
 		////DEBUG & STATS
 		System.out.println();
-		for (Map.Entry<Long, Integer> entry : transitionCounts.entrySet()) {
-			System.out.println(tagSet.tagGramToString(entry.getKey())+": "+entry.getValue());
+		for (Multiset.Entry<Long> entry : transitionCounts.entrySet()) {
+			System.out.println(tagSet.tagGramToString(entry.getElement())+": "+entry.getCount());
 		}
+		//for (Map.Entry<Long, Integer> entry : transitionCounts.entrySet()) {
+		//	System.out.println(tagSet.tagGramToString(entry.getKey())+": "+entry.getValue());
+		//}
 		System.out.println();
 		System.out.println("totalTransitions: "+totalTransitions);
-		System.out.println("discriminative Transitions: "+ transitionCounts.size());
+		System.out.println("discriminative Transitions: "+ transitionCounts.elementSet().size());
 
-		float mean = (float)totalTransitions/(float) transitionCounts.size();
+		float mean = (float)totalTransitions/(float) transitionCounts.elementSet().size();
 		System.out.println("mean: "+mean);
 		//////////////////
 	}

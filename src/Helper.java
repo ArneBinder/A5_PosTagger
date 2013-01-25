@@ -10,8 +10,8 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class Helper {
-
-	static HashMap<Integer, Long> gramMask = new HashMap<Integer, Long>(8);
+	static final int maxGramCount = 7;
+	static HashMap<Integer, Long> gramMask = new HashMap<Integer, Long>(maxGramCount);
 	static final char tagDelimiter = '/';
 
 	/**
@@ -29,6 +29,7 @@ public class Helper {
 		gramMask.put(4, 0xFFFFFFFFL);
 		gramMask.put(5, 0xFFFFFFFFFFL);
 		gramMask.put(6, 0xFFFFFFFFFFFFL);
+		gramMask.put(7, 0xFFFFFFFFFFFFFFL);
 	}
 
 

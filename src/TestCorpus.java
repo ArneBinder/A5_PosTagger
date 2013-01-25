@@ -21,7 +21,11 @@ public class TestCorpus {
 		corpus.writeContentToFile("outTest");
 		HMM hmm = new HMM();
 		//corpus.constructPartition(10);
-		hmm.train(corpus, 5, tagSet);
+		hmm.train(corpus, 2, tagSet);
 		//System.out.println("".split("/").length);
+		System.out.println();
+		System.out.println(tagSet);
+		TagSet tagSet1 = new TagSet(tagSet.toString());
+		System.out.println(tagSet1);
 	}
 }

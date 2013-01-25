@@ -5,10 +5,11 @@
  * Time: 23:12
  * To change this template use File | Settings | File Templates.
  */
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class BidiMap<KeyType, ValueType>{
+public class BidiMap<KeyType, ValueType> {
 	private Map<KeyType, ValueType> keyToValueMap = new ConcurrentHashMap<KeyType, ValueType>();
 	private Map<ValueType, KeyType> valueToKeyMap = new ConcurrentHashMap<ValueType, KeyType>();
 
@@ -48,5 +49,6 @@ public class BidiMap<KeyType, ValueType>{
 	public int size(){
 		return keyToValueMap.size();
 	}
+
 }
 

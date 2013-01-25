@@ -8,22 +8,39 @@
 public class TagSet {
 	public final int tagBound = 128;
 	public final int tagBoundBitCount = 8;
+
+	/**
+	 * tagMap contains a mapping from tag strings to byte indices (Attention: 1 .. (tagBound-1))
+	 */
 	private BidiMap<String, Byte> tagMap = new BidiMap<String, Byte>();
 
-	public TagSet(String tagString){
-	   String[] tags = tagString.split(Helper.tagDelimiter+"");
-		assert tags.length < tagBound : "unable to set up tags, size of tag list="+(tags.length-1)+" exceeds tagBound="+tagBound+".";
-		for (byte i = 1; i < tags.length; i++) {
-			tagMap.put(tags[i],i);
+	/**
+	 * @param tagString have to be structured like "tagA/tagB/tagC/" don't forget the last slash!
+	 */
+	public TagSet(String tagString) {
+		if (tagString.length() > 0) {
+			String[] tags = tagString.split(Helper.tagDelimiter + "");
+			assert tags.length < tagBound : "unable to set up tags, size of tag list=" + (tags.length - 1) + " exceeds tagBound=" + tagBound + ".";
+			for (byte i = 1; i < tags.length + 1; i++) {
+				tagMap.put(tags[i - 1], i);
+			}
 		}
+	}
+
+	public String toString() {
+		String result = "";
+		for (byte i = 1; i < tagMap.size() + 1; i++) {
+			result += tagMap.getKey(i) + Helper.tagDelimiter;
+		}
+		return result;
 	}
 
 	public byte tagToByte(String tag) {
 		try {
 			return tagMap.get(tag);
 		} catch (java.lang.NullPointerException e) {
-			assert tagMap.size() + 1 < tagBound : "unable to set up new tag, tagBound="+tagBound+" reached.";
-			tagMap.put(tag, (byte) (tagMap.size()+1));
+			assert tagMap.size() + 1 < tagBound : "unable to set up new tag, tagBound=" + tagBound + " reached.";
+			tagMap.put(tag, (byte) (tagMap.size() + 1));
 			return tagMap.get(tag);
 		}
 
