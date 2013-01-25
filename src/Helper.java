@@ -10,11 +10,9 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class Helper {
-	public static final int tagBound = 128;
-	public static final int tagBoundBitCount = 8;
-	private static BidiMap<String, Byte> tagMap = new BidiMap<String, Byte>();
-	static HashMap<Integer, Long> gramMask = new HashMap<Integer, Long>(8);
 
+	static HashMap<Integer, Long> gramMask = new HashMap<Integer, Long>(8);
+	static final char tagDelimiter = '/';
 
 	/**
 	 * max tag-value: 127
@@ -33,30 +31,7 @@ public class Helper {
 		gramMask.put(6, 0xFFFFFFFFFFFFL);
 	}
 
-	public static byte tagToByte(String tag) {
-		try {
-			return tagMap.get(tag);
-		} catch (java.lang.NullPointerException e) {
-			assert tagMap.size() + 1 < tagBound : "unable to set up new tag, tagBound="+tagBound+" reached.";
-			tagMap.put(tag, (byte) (tagMap.size()+1));
-			return tagMap.get(tag);
-		}
 
-	}
-
-	public static String tagToString(byte tag) {
-		return tagMap.getKey(tag);
-	}
-
-	public static String tagGramToString(long tagGram) {
-		String result = "";
-		while (tagGram != 0) {
-			result = tagToString((byte) (tagGram & 0xFF)) + "/" + result;
-			tagGram >>= tagBoundBitCount;
-		}
-
-		return result;
-	}
 
 
 

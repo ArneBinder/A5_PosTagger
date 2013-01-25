@@ -31,7 +31,7 @@ public class HMM {
 	/**
 	 * write model (to file)
 	 */
-	public void train(Corpus corpus, int gramCount) {
+	public void train(Corpus corpus, int gramCount, TagSet tagSet) {
 		assert gramCount < 8 : "max qGram size is 7.";
 		transitionCounts = new HashMap<Long, Integer>();//(gramCount)
 		totalTransitions = 0;
@@ -42,7 +42,7 @@ public class HMM {
 				totalTransitions++;
 
 				//System.out.println(Helper.tagGramToString(sentence.getPrevTagsCoded(i,3)));
-				tagGram <<= Helper.tagBoundBitCount;
+				tagGram <<= tagSet.tagBoundBitCount;
 				tagGram &= Helper.gramMask.get(gramCount+1);
 				tagGram += sentence.getTag(i);
 				//System.out.println(Helper.tagGramToString(tagGram) + ": " + Helper.tagGramToString(sentence.getTag(i)));
@@ -61,7 +61,7 @@ public class HMM {
 		////DEBUG & STATS
 		System.out.println();
 		for (Map.Entry<Long, Integer> entry : transitionCounts.entrySet()) {
-			System.out.println(Helper.tagGramToString(entry.getKey())+": "+entry.getValue());
+			System.out.println(tagSet.tagGramToString(entry.getKey())+": "+entry.getValue());
 		}
 		System.out.println();
 		System.out.println("totalTransitions: "+totalTransitions);

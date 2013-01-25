@@ -7,7 +7,8 @@
  */
 public class TestCorpus {
 	public static void main(String[] args) {
-		Corpus corpus = new Corpus();
+		TagSet tagSet = new TagSet("");
+		Corpus corpus = new Corpus(tagSet);
 		corpus.addContentFromFile("brown_learn\\ca01");
 		corpus.addContentFromFile("brown_learn\\ca02");
 		corpus.addContentFromFile("brown_learn\\ca03");
@@ -20,7 +21,7 @@ public class TestCorpus {
 		corpus.writeContentToFile("outTest");
 		HMM hmm = new HMM();
 		//corpus.constructPartition(10);
-		hmm.train(corpus, 2);
+		hmm.train(corpus, 5, tagSet);
 		//System.out.println("".split("/").length);
 	}
 }

@@ -21,11 +21,13 @@ public class Corpus {
 	 */
 	private List<Sentence> content;
 	private List<Sentence>[] partition;
+	private TagSet tagSet;
 
 	///////// Methods ////////////
 
-	Corpus() {
+	Corpus(TagSet tagSet) {
 		content = new ArrayList<Sentence>();
+		this.tagSet = tagSet;
 	}
 
 	public List<Sentence> getContent() {
@@ -47,7 +49,7 @@ public class Corpus {
 			//Read File Line By Line
 			while ((strLine = br.readLine()) != null) {
 				if (strLine.length() > 0) {
-					content.add(new Sentence(strLine));
+					content.add(new Sentence(strLine, tagSet));
 				}
 			}
 			//Close the input stream
@@ -83,7 +85,7 @@ public class Corpus {
 	} */
 
 	public Corpus getTrainCorpus(int excludeIndex){
-		Corpus result = new Corpus();
+		Corpus result = new Corpus(tagSet);
 		for (int i = 0; i < partition.length; i++) {
 			if (i != excludeIndex)
 				result.content.addAll(partition[i]);
@@ -92,7 +94,7 @@ public class Corpus {
 	}
 
 	public Corpus getEvaluationCorpus(int excludeIndex){
-		Corpus result = new Corpus();
+		Corpus result = new Corpus(tagSet);
 		result.content.addAll(partition[excludeIndex]);
 		return result;
 	}
