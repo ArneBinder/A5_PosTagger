@@ -22,18 +22,19 @@ public class HMM {
 	 * - emissionProbs
 	 */
 
-	Multiset<Long> transitionCounts;
-	Multiset<Long> totalTransitions;
+	Corpus corpus;
+	int gramCount;
+	TagSet tagSet;
 
-	int allTransitionCount;
-	// saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
-	Multiset<Map.Entry<Long,String>>[] emissionCounts;
-	//saves how often a posGram total occurs
-	Multiset<Long> totalEmissions;
-
-	//int gramCount;
 
 	//////// Methods ///////////
+
+	HMM(Corpus corpus, int gramCount, TagSet tagSet) {
+		assert gramCount <= Helper.maxGramCount : "given gram count = " + gramCount + " is bigger than max gram count = " + Helper.maxGramCount + ".";
+		this.corpus = corpus;
+		this.gramCount = gramCount;
+		this.tagSet = tagSet;
+	}
 
 	/**
 	 * read model (from file))
@@ -42,22 +43,21 @@ public class HMM {
 	/**
 	 * write model (to file)
 	 */
-	public void train(Corpus corpus, int gramCount, TagSet tagSet) {
-		assert gramCount <= Helper.maxGramCount : "given gram count = "+gramCount+" is bigger than max gram count = "+Helper.maxGramCount+".";
-		transitionCounts = HashMultiset.create();//new HashMap<Long, Integer>();//(gramCount)
-		totalTransitions = HashMultiset.create();
-		totalEmissions = HashMultiset.create();
-		emissionCounts = new Multiset[FeatureVector.size];
+	public void train() {
+		Multiset<Long> transitionCounts = HashMultiset.create();
+		Multiset<Long> totalTransitions = HashMultiset.create();
+		Multiset<Map.Entry<Long, String>>[] emissionCounts = new Multiset[FeatureVector.size]; // saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
+		Multiset<Long> totalEmissions = HashMultiset.create(); //saves how often a posGram occurs in total
+		int allTransitionCount; //STATS
 		for (int i = 0; i < emissionCounts.length; i++) {
 			emissionCounts[i] = HashMultiset.create();
 		}
-		//totalEmissions = 0;
 		allTransitionCount = 0;
 		long tagGram;
 		for (Sentence sentence : corpus.getContent()) {
 			tagGram = 0;
 			for (int i = 0; i < sentence.length(); i++) {
-				allTransitionCount++;
+				allTransitionCount++;  //STATS
 				totalTransitions.add(tagGram);
 				tagGram <<= tagSet.tagBoundBitCount;
 				tagGram += sentence.getTag(i);
@@ -66,15 +66,15 @@ public class HMM {
 				//System.out.println(Helper.tagGramToString(sentence.getPrevTagsCoded(i,3)));
 				tagGram &= Helper.gramMask.get(gramCount);
 				// --> auch zaehlen fuer normierung der emissionsCounts
-			 	totalEmissions.add(tagGram);
+				totalEmissions.add(tagGram);
 
-				System.out.println(tagSet.tagGramToString(tagGram) + ": " + tagSet.tagGramToString(sentence.getTag(i)));
+				//System.out.println(tagSet.tagGramToString(tagGram) + ": " + tagSet.tagGramToString(sentence.getTag(i)));
 
 				////
 				// Features des aktuellen Wortes extrahieren & (gramTag --> Features) zaehlen
 				FeatureExtractor featureExtractor = new FeatureExtractor();
 				FeatureVector featureVector = featureExtractor.getFeatures(sentence, i);
-				for (int j = 0; j < FeatureVector.size; j++){
+				for (int j = 0; j < FeatureVector.size; j++) {
 					//TODO: check, if Pair works correct
 					emissionCounts[j].add(new Pair<Long, String>(tagGram, featureVector.features[j]));
 				}
@@ -103,24 +103,26 @@ public class HMM {
 			// --> array aus fromPosTagGram, toPosTagGram, logProb
 
 		}
-
-
 		////////////////////////
 
 
 		////DEBUG & STATS
 		System.out.println();
 		for (Multiset.Entry<Long> entry : transitionCounts.entrySet()) {
-			System.out.println(tagSet.tagGramToString(entry.getElement())+": "+entry.getCount());
+			System.out.println(tagSet.tagGramToString(entry.getElement()) + ": " + entry.getCount());
 		}
 
 		System.out.println();
-		System.out.println("allTransitionCount: "+allTransitionCount);
+		System.out.println("allTransitionCount: " + allTransitionCount);
 		System.out.println("discriminative Transitions: " + transitionCounts.elementSet().size());
 
-		float mean = (float)allTransitionCount/(float) transitionCounts.elementSet().size();
-		System.out.println("mean: "+mean);
+		float mean = (float) allTransitionCount / (float) transitionCounts.elementSet().size();
+		System.out.println("mean: " + mean);
 		//////////////////
+	}
+
+	public void tagSentence(Sentence sentence){
+
 	}
 
 
