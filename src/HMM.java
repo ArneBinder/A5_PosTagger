@@ -1,4 +1,6 @@
 import com.google.common.collect.HashMultiset;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 
 import java.util.HashMap;
@@ -21,8 +23,9 @@ public class HMM {
 	//HashMap<Long, Integer> transitionCounts;
 	Multiset<Long> transitionCounts;
 	int totalTransitions;
-	// emissionCounts;
-	int totalEmissions;
+	Multiset<ImmutableMap<Long,String>>[] emissionCounts;
+	//saves how often a
+	Multiset<Long> totalEmissions;
 
 	//int gramCount;
 
@@ -36,10 +39,11 @@ public class HMM {
 	 * write model (to file)
 	 */
 	public void train(Corpus corpus, int gramCount, TagSet tagSet) {
-		assert gramCount <= Helper.maxGramCount : "max qGram size is "+Helper.maxGramCount+".";
+		assert gramCount <= Helper.maxGramCount : "given gram count = "+gramCount+" is bigger than max gram count = "+Helper.maxGramCount+".";
 		transitionCounts = HashMultiset.create();//new HashMap<Long, Integer>();//(gramCount)
 		totalTransitions = 0;
-		totalEmissions = 0;
+
+		//totalEmissions = 0;
 
 		long tagGram = 0;
 		for (Sentence sentence : corpus.getContent()) {
@@ -48,33 +52,46 @@ public class HMM {
 
 				//System.out.println(Helper.tagGramToString(sentence.getPrevTagsCoded(i,3)));
 				tagGram &= Helper.gramMask.get(gramCount);
+				// --> auch zaehlen fuer normierung der emissionsCounts
+				// totalEmissions.add(tagGram)
+
 				tagGram <<= tagSet.tagBoundBitCount;
 				tagGram += sentence.getTag(i);
 				System.out.println(tagSet.tagGramToString(tagGram) + ": " + tagSet.tagGramToString(sentence.getTag(i)));
 				transitionCounts.add(tagGram);
-				//if (!transitionCounts.containsKey(tagGram))
-				//	transitionCounts.put(tagGram, 1);
-				//else
-				//	transitionCounts.put(tagGram, transitionCounts.get(tagGram)+1);
+
+
+
+
 
 				////
-				// TODO: Features des aktuellen Wortes extrahieren & (gramTag --> Features) zaehlen
+				// Features des aktuellen Wortes extrahieren & (gramTag --> Features) zaehlen
+				FeatureExtractor featureExtractor = new FeatureExtractor();
+				FeatureVector featureVector = featureExtractor.getFeatures(sentence, i);
+				for (int j = 0; j < FeatureVector.size; j++){
+					emissionCounts[j].add(ImmutableMap.of(tagGram, featureVector.features[j]));
+				}
 			}
+
+
+
 			tagGram = 0;
 			System.out.println();
 		}
+
+		//// normieren
+		// emissionCounts durch transition counts
+
 
 		////DEBUG & STATS
 		System.out.println();
 		for (Multiset.Entry<Long> entry : transitionCounts.entrySet()) {
 			System.out.println(tagSet.tagGramToString(entry.getElement())+": "+entry.getCount());
 		}
-		//for (Map.Entry<Long, Integer> entry : transitionCounts.entrySet()) {
-		//	System.out.println(tagSet.tagGramToString(entry.getKey())+": "+entry.getValue());
-		//}
+
 		System.out.println();
 		System.out.println("totalTransitions: "+totalTransitions);
-		System.out.println("discriminative Transitions: "+ transitionCounts.elementSet().size());
+		System.out.println("discriminative Transitions: " + transitionCounts.elementSet().size());
 
 		float mean = (float)totalTransitions/(float) transitionCounts.elementSet().size();
 		System.out.println("mean: "+mean);

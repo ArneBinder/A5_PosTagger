@@ -6,4 +6,9 @@
  * To change this template use File | Settings | File Templates.
  */
 public class FeatureExtractor {
+	public FeatureVector getFeatures(Sentence sentence, int index){
+		FeatureVector featureVector = new FeatureVector();
+
+		return featureVector;
+	}
 }

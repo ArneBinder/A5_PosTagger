@@ -8,6 +8,9 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class FeatureVector {
-	private HashMap features;
-
+	public String[] features;
+	public static final int size = 4;
+	FeatureVector(){
+		this.features = new String[size];
+	}
 }
