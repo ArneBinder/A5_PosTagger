@@ -21,6 +21,9 @@ public class Sentence {
 	public String[] getWords() {
 		return words;
 	}
+	public String getWord(int index){
+		return words[index];
+	}
 
 	public byte[] getTags() {
 		return tags;

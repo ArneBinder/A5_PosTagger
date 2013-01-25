@@ -121,8 +121,33 @@ public class HMM {
 		//////////////////
 	}
 
+	//TODO: qGram-Pos-Tags
 	public void tagSentence(Sentence sentence){
-
+		FeatureExtractor featureExtractor = new FeatureExtractor();
+		double[][] pathProbs = new double[sentence.length()+1][tagSet.size()];
+		// TODO: set initial Probs (for pathProbs[0])
+		int[] sources = new int[sentence.length()];
+		long tagGram = 0;
+		// for all words do...
+		for (int i = 1; i < sentence.length(); i++) {
+			//String word = sentence.getWord(i);
+			FeatureVector featureVector = featureExtractor.getFeatures(sentence,i);
+			//for all current possible tags do...
+			for (int j = 0; j < Math.pow(tagSet.size(),gramCount); j++) {
+				double maxProb = 0;
+				//for all possible previous tags do..
+				for (int k = 0; k < Math.pow(tagSet.size(),gramCount); k++) {
+					double currentProb = pathProbs[i-1][k]+transitionProbs(k,j);
+					if(currentProb > maxProb){
+						maxProb = currentProb;
+						sources[i-1] = k;
+					}
+				}
+				pathProbs[i][j] = maxProb + emitProb(j, featureVector);
+			}
+		}
+	   //for each word with index i do:
+		// calculate max(tempProb(tag[i-1])*transProb(tag[i-1], tag))*emissionProb(tag, word))
 	}
 
 
