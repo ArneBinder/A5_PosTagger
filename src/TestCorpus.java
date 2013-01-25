@@ -20,7 +20,7 @@ public class TestCorpus {
 		corpus.writeContentToFile("outTest");
 		HMM hmm = new HMM();
 		//corpus.constructPartition(10);
-		hmm.train(corpus, 1);
+		hmm.train(corpus, 2);
 		//System.out.println("".split("/").length);
 	}
 }
