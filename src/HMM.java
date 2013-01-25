@@ -64,6 +64,7 @@ public class HMM {
 
 
 
+
 				////
 				// Features des aktuellen Wortes extrahieren & (gramTag --> Features) zaehlen
 				FeatureExtractor featureExtractor = new FeatureExtractor();
