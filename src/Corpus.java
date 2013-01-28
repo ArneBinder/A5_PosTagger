@@ -34,6 +34,18 @@ public class Corpus {
 		return content;
 	}
 
+	public Sentence getSentence(int index){
+		return content.get(index);
+	}
+
+	public void setSentence(Sentence sentence, int index){
+		content.set(index,sentence);
+	}
+
+	public int size(){
+		return content.size();
+	}
+
 	/**
 	 * read text (from file)
 	 * - tagged or

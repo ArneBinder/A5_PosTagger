@@ -61,6 +61,10 @@ public class Sentence {
 		return result;
 	}
 
+	public void setTags(byte[] tags){
+		System.arraycopy(tags,0,this.tags,0,this.tags.length);
+	}
+
 	public String getPrevTags(int index, int count) {
 		String result = "";//new String[count];
 		for (int i = index - count; i < 0; i++) {
