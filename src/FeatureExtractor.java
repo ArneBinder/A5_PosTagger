@@ -8,7 +8,7 @@
 public class FeatureExtractor {
 	public FeatureVector getFeatures(Sentence sentence, int index){
 		FeatureVector featureVector = new FeatureVector();
-
+		// Todo: implement getFeatures!
 		return featureVector;
 	}
 }

@@ -42,6 +42,10 @@ public class Corpus {
 		content.set(index,sentence);
 	}
 
+	public void addSentence(Sentence sentence){
+		content.add(sentence);
+	};
+
 	public int size(){
 		return content.size();
 	}

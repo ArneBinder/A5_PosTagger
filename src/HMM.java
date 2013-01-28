@@ -21,11 +21,11 @@ public class HMM {
 	 * - transitionProbs
 	 * - emissionProbs
 	 */
+	HashMap<Long, Double> transitionProbs;
 
 	Corpus corpus;
 	int gramCount;
 	TagSet tagSet;
-
 
 	//////// Methods ///////////
 
@@ -101,6 +101,7 @@ public class HMM {
 			Long posGram = (entry.getElement() >> TagSet.tagBoundBitCount);
 			double logProb = Math.log(entry.getCount()) - Math.log(totalTransitions.count(posGram));
 			// --> array aus fromPosTagGram, toPosTagGram, logProb
+			transitionProbs.put(entry.getElement(), logProb);
 
 		}
 		////////////////////////
@@ -121,17 +122,19 @@ public class HMM {
 		//////////////////
 	}
 
-	public void tag(){
+	public Corpus tag() {
+		Corpus taggedCorpus = new Corpus(tagSet);
 		for (int i = 0; i < corpus.size(); i++) {
-			corpus.setSentence(tagSentence(corpus.getSentence(i)),i);
+			taggedCorpus.setSentence(tagSentence(corpus.getSentence(i)), i);
 		}
+		return taggedCorpus;
 	}
 
 	private Sentence tagSentence(Sentence sentence) {
 		FeatureExtractor featureExtractor = new FeatureExtractor();
 		double[][] pathProbs = new double[sentence.length() + 1][tagSet.size()];
 		// set initial transition probabilities
-		for (int i = 0; i < tagSet.size(); i++) {
+		for (byte i = 0; i < tagSet.size(); i++) {
 			pathProbs[0][i] = getTransitionProb(0, i);
 		}
 
@@ -150,7 +153,7 @@ public class HMM {
 								for (byte prevTagIndex2 = 0; prevTagIndex2 < tagSet.size(); prevTagIndex2++) {
 									for (byte prevTagIndex1 = 0; prevTagIndex1 < tagSet.size(); prevTagIndex1++) {
 
-										for (int j = 0; j < tagSet.size(); j++) {
+										for (byte j = 0; j < tagSet.size(); j++) {
 											double maxProb = 0;
 											//for all current possible tags (target) do...
 											for (int currentTagIndex = 0; currentTagIndex < tagSet.size(); currentTagIndex++) {
@@ -197,13 +200,20 @@ public class HMM {
 			currentProb = pathProbs[sentence.length()][i];
 			if (currentProb > resultProb) {
 				resultProb = currentProb;
-				bestTags[sentence.length()-1] = i;
+				bestTags[sentence.length() - 1] = i;
 			}
 		}
 		sentence.setTags(bestTags);
 		return sentence;
-		// collect
 
+	}
+
+	private double getTransitionProb(long prevTags, byte currentTag) {
+		return transitionProbs.get((prevTags << tagSet.tagBoundBitCount) + currentTag);
+	}
+
+	private double getEmitProb(byte tag, FeatureVector featureVector) {
+	   // TODO: implement getEmitProb!
 	}
 
 }
