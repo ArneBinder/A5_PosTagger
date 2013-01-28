@@ -32,7 +32,19 @@ public class Helper {
 		gramMask.put(7, 0xFFFFFFFFFFFFFFL);
 	}
 
+	/*public static int ipow(int base, int exp)
+	{
+		int result = 1;
+		while (exp != 0)
+		{
+			if ((exp & 1) !=0)
+				result *= base;
+			exp >>= 1;
+			base *= base;
+		}
 
+		return result;
+	} */
 
 
 

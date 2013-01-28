@@ -21,7 +21,10 @@ public class HMM {
 	 * - transitionProbs
 	 * - emissionProbs
 	 */
+	// prevGramPosTag<<8+posTag --> probability
 	HashMap<Long, Double> transitionProbs;
+	// pos-tag x feature-index x feature-value --> probability
+	HashMap<String, Double>[][] emissionProbs;
 
 	Corpus corpus;
 	int gramCount;
@@ -36,17 +39,11 @@ public class HMM {
 		this.tagSet = tagSet;
 	}
 
-	/**
-	 * read model (from file))
-	 */
 
-	/**
-	 * write model (to file)
-	 */
 	public void train() {
 		Multiset<Long> transitionCounts = HashMultiset.create();
 		Multiset<Long> totalTransitions = HashMultiset.create();
-		Multiset<Map.Entry<Long, String>>[] emissionCounts = new Multiset[FeatureVector.size]; // saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
+		Multiset<Map.Entry<Byte, String>>[] emissionCounts = new Multiset[FeatureVector.size]; // saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
 		Multiset<Long> totalEmissions = HashMultiset.create(); //saves how often a posGram occurs in total
 		int allTransitionCount; //STATS
 		for (int i = 0; i < emissionCounts.length; i++) {
@@ -54,13 +51,15 @@ public class HMM {
 		}
 		allTransitionCount = 0;
 		long tagGram;
+		byte currentTag;
 		for (Sentence sentence : corpus.getContent()) {
 			tagGram = 0;
 			for (int i = 0; i < sentence.length(); i++) {
 				allTransitionCount++;  //STATS
 				totalTransitions.add(tagGram);
-				tagGram <<= tagSet.tagBoundBitCount;
-				tagGram += sentence.getTag(i);
+				tagGram <<= TagSet.tagBoundBitCount;
+				currentTag = sentence.getTag(i);
+				tagGram += currentTag;
 				transitionCounts.add(tagGram);
 
 				//System.out.println(Helper.tagGramToString(sentence.getPrevTagsCoded(i,3)));
@@ -76,7 +75,7 @@ public class HMM {
 				FeatureVector featureVector = featureExtractor.getFeatures(sentence, i);
 				for (int j = 0; j < FeatureVector.size; j++) {
 					//TODO: check, if Pair works correct
-					emissionCounts[j].add(new Pair<Long, String>(tagGram, featureVector.features[j]));
+					emissionCounts[j].add(new Pair<Byte, String>(currentTag/*tagGram*/, featureVector.features[j]));
 				}
 			}
 
@@ -84,18 +83,22 @@ public class HMM {
 		}
 
 		//// normieren //////////
-		// emissionCounts by totalEmissions
+		/* emissionCounts by totalEmissions */
+		// pos-tag x feature-index x feature-value --> probability
+		emissionProbs = new HashMap[tagSet.size()][FeatureVector.size];
 		for (byte i = 0; i < FeatureVector.size; i++) {
-			for (Multiset.Entry<Map.Entry<Long, String>> entry : emissionCounts[i].entrySet()) {
-				Long posGram = entry.getElement().getKey();
-				double logProb = Math.log(entry.getCount()) - Math.log(totalEmissions.count(posGram));
+			for (Multiset.Entry<Map.Entry<Byte, String>> entry : emissionCounts[i].entrySet()) {
+				byte posTag = entry.getElement().getKey();
+				double logProb = Math.log(entry.getCount()) - Math.log(totalEmissions.count(posTag));
 				//int featureIndex = i;
-
+				emissionProbs[posTag][i].put(entry.getElement().getValue(),logProb);
 				// --> array aus posTagGram, featureIndex, featureValue, logProb
+
 			}
 		}
 
-		// transitionCounts by totalTransitions
+		/* transitionCounts by totalTransitions */
+		transitionProbs = new HashMap<Long, Double>();
 		for (Multiset.Entry<Long> entry : transitionCounts.entrySet()) {
 			// reconstruct source posGram
 			Long posGram = (entry.getElement() >> TagSet.tagBoundBitCount);
@@ -213,7 +216,30 @@ public class HMM {
 	}
 
 	private double getEmitProb(byte tag, FeatureVector featureVector) {
-	   // TODO: implement getEmitProb!
+		double resultProb = 0;
+		for (int i = 0; i < FeatureVector.size; i++) {
+			// pos-tag x feature-index x feature-value --> probability
+			// TODO: implement weights!
+			// TODO: implement smoothing! (if value doesn't exist --> error at the moment)
+			resultProb += emissionProbs[tag][i].get(featureVector.features[i]);
+		}
+		return resultProb;
+
+	}
+
+	/**
+	 * read model (from file))
+	 */
+	public void readModelFromFile(){
+		//TODO: implement!
+	}
+
+	/**
+	 * write model (to file)
+	 */
+	public void writeModelToFile(){
+		//TODO: implement!
+		//TODO: write also Tagset?!
 	}
 
 }
