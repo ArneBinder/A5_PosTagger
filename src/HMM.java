@@ -260,6 +260,21 @@ public class HMM {
 	public void writeModelToFile() {
 		//TODO: implement!
 		//TODO: write also Tagset?!
+
+		// write emissionProbs
+		// pos-tag x feature-index x feature-value --> probability
+		for (int posTagIndex = 0; posTagIndex < tagSet.size(); posTagIndex++) {
+			for (int featureIndex = 0; featureIndex < FeatureVector.size; featureIndex++) {
+				//ein Eintrag! vorher anzahl speichern
+				for (Map.Entry<String, Double> entry : emissionProbs[posTagIndex][featureIndex].entrySet()) {
+
+
+
+
+				}
+			}
+		}
+
 	}
 
 }
