@@ -43,7 +43,7 @@ public class HMM {
 	public void train() {
 		Multiset<Long> transitionCounts = HashMultiset.create();
 		Multiset<Long> totalTransitions = HashMultiset.create();
-		Multiset<Map.Entry<Byte, String>>[] emissionCounts = new Multiset[FeatureVector.size]; // saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
+		Multiset<Map.Entry<Byte, String>>[] emissionCounts = new Multiset[FeatureExtractor.featureSize]; // saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
 		Multiset<Byte> totalEmissions = HashMultiset.create(); //saves how often a posGram occurs in total
 		int allTransitionCount; //STATS
 		for (int i = 0; i < emissionCounts.length; i++) {
@@ -74,7 +74,7 @@ public class HMM {
 				// Features des aktuellen Wortes extrahieren & (gramTag --> Features) zaehlen
 
 				FeatureVector featureVector = featureExtractor.getFeatures(sentence, i);
-				for (int j = 0; j < FeatureVector.size; j++) {
+				for (int j = 0; j < FeatureExtractor.featureSize; j++) {
 					//TODO: check, if Pair works correct
 					emissionCounts[j].add(new Pair<Byte, String>(currentTag/*tagGram*/, featureVector.features[j]));
 				}
@@ -86,8 +86,8 @@ public class HMM {
 		//// normieren //////////
 		/* emissionCounts by totalEmissions */
 		// pos-tag x feature-index x feature-value --> probability
-		emissionProbs = new HashMap[tagSet.size()][FeatureVector.size];
-		for (byte i = 0; i < FeatureVector.size; i++) {
+		emissionProbs = new HashMap[tagSet.size()][FeatureExtractor.featureSize];
+		for (byte i = 0; i < FeatureExtractor.featureSize; i++) {
 			for (Multiset.Entry<Map.Entry<Byte, String>> entry : emissionCounts[i].entrySet()) {
 				byte posTag = entry.getElement().getKey();
 				double logProb = Math.log(entry.getCount()) - Math.log(totalEmissions.count(posTag));
@@ -237,7 +237,7 @@ public class HMM {
 
 	private double getEmitProb(byte tag, FeatureVector featureVector) {
 		double resultProb = 0;
-		for (int i = 0; i < FeatureVector.size; i++) {
+		for (int i = 0; i < FeatureExtractor.featureSize; i++) {
 			// pos-tag x feature-index x feature-value --> probability
 			// TODO: implement weights!
 			// TODO: implement smoothing! (if value doesn't exist --> error at the moment)
