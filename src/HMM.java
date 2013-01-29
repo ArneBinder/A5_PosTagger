@@ -3,6 +3,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 
+import java.io.*;
+import java.nio.CharBuffer;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -252,6 +254,30 @@ public class HMM {
 	 */
 	public void readModelFromFile() {
 		//TODO: implement!
+
+
+		BufferedReader br = new BufferedReader(new FileReader(new File(fileName)));
+
+		// write emissionProbs
+		// pos-tag x feature-index x feature-value --> probability
+		try {
+			int tagSetSize = readInteger(br);
+
+
+			for (int posTagIndex = 0; posTagIndex < tagSetSize; posTagIndex++) {
+				for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
+
+
+					int listLength = readInteger(br);
+					for (int i = 0; i < listLength; i++) {
+
+
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
 	}
 
 	/**
@@ -261,20 +287,63 @@ public class HMM {
 		//TODO: implement!
 		//TODO: write also Tagset?!
 
+
+		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName)));
+
 		// write emissionProbs
 		// pos-tag x feature-index x feature-value --> probability
-		for (int posTagIndex = 0; posTagIndex < tagSet.size(); posTagIndex++) {
-			for (int featureIndex = 0; featureIndex < FeatureVector.size; featureIndex++) {
-				//ein Eintrag! vorher anzahl speichern
-				for (Map.Entry<String, Double> entry : emissionProbs[posTagIndex][featureIndex].entrySet()) {
+		try {
+			bw.write(tagSet.size() + ",");
 
+			for (int posTagIndex = 0; posTagIndex < tagSet.size(); posTagIndex++) {
+				for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
+					//ein Eintrag! vorher anzahl speichern
+					bw.write(emissionProbs[posTagIndex][featureIndex].size() + ",");
 
-
-
+					for (Map.Entry<String, Double> entry : emissionProbs[posTagIndex][featureIndex].entrySet()) {
+						String eintrag = entry.getKey();
+						bw.write(eintrag.length() + ",");
+						bw.write(eintrag + ",");
+					}
 				}
 			}
+		} catch (IOException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
-
 	}
 
+	private static int readInteger(BufferedReader br)
+	{
+		int value = 0;
+		int base = 1;
+		try {
+			int c = br.read();
+			while (c != 44)
+			{
+				value += base * (c - 48);
+				c = br.read();
+				base *= 10;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+		return value;
+	}
+
+	private static String readString(BufferedReader br)
+	{
+		String word = "";
+
+		try {
+			int c = br.read();
+			while (c != 44)
+			{
+				word = word + c;
+				c = br.read();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+		return word;
+	}
 }
