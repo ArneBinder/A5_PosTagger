@@ -140,7 +140,7 @@ public class HMM {
 		byte[][] sourceTags = new byte[sentence.length()][tagSet.size()];
 		// set initial transition probabilities
 		for (byte i = 0; i < tagSet.size(); i++) {
-			pathProbs[0][i] = transitionProbs.get(i);
+			pathProbs[0][i] = getTransitionProb(i);
 		}
 
 		//byte[] bestTags = new byte[sentence.length()];
@@ -162,7 +162,7 @@ public class HMM {
 										for (byte prevTagIndex1 = 0; prevTagIndex1 < tagSet.size(); prevTagIndex1++) {
 
 											//for all current possible tags (target) do...
-											double currentProb = pathProbs[currentWordIndex][currentTagIndex] + transitionProbs.get(tagGramCoded);
+											double currentProb = pathProbs[currentWordIndex][currentTagIndex] + getTransitionProb(tagGramCoded);
 											if (currentProb > maxProb) {
 												maxProb = currentProb;
 												sourceTags[currentWordIndex][currentTagIndex] = prevTagIndex1;
@@ -230,10 +230,10 @@ public class HMM {
 
 	}
 
-	//private double getTransitionProb(long tags) {
-	// TODO: Smoothing!
-	//	return transitionProbs.get((prevTags << tagSet.tagBoundBitCount) + currentTag);
-	//}
+	private double getTransitionProb(long tags) {
+		// TODO: Smoothing!
+		return transitionProbs.get(tags);
+	}
 
 	private double getEmitProb(byte tag, FeatureVector featureVector) {
 		double resultProb = 0;
