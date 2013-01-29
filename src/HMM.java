@@ -66,7 +66,6 @@ public class HMM {
 				//System.out.println(Helper.tagGramToString(sentence.getPrevTagsCoded(i,3)));
 				tagGram &= Helper.gramMask.get(gramCount);
 				// --> auch zaehlen fuer normierung der emissionsCounts
-				//Todo: check! just currentTag instead of tagGram? --> yes
 				totalEmissions.add(currentTag);
 
 				//System.out.println(tagSet.tagGramToString(tagGram) + ": " + tagSet.tagGramToString(sentence.getTag(i)));
@@ -138,12 +137,13 @@ public class HMM {
 	private Sentence tagSentence(Sentence sentence) {
 		FeatureExtractor featureExtractor = new FeatureExtractor();
 		double[][] pathProbs = new double[sentence.length() + 1][tagSet.size()];
+		byte[][] sourceTags = new byte[sentence.length()][tagSet.size()];
 		// set initial transition probabilities
 		for (byte i = 0; i < tagSet.size(); i++) {
-			pathProbs[0][i] =  transitionProbs.get(i);
+			pathProbs[0][i] = transitionProbs.get(i);
 		}
 
-		byte[] bestTags = new byte[sentence.length()];
+		//byte[] bestTags = new byte[sentence.length()];
 		long tagGramCoded = 0x100L;
 
 		// for all words do...
@@ -165,68 +165,73 @@ public class HMM {
 											double currentProb = pathProbs[currentWordIndex][currentTagIndex] + transitionProbs.get(tagGramCoded);
 											if (currentProb > maxProb) {
 												maxProb = currentProb;
-												bestTags[currentWordIndex] = prevTagIndex1;
+												sourceTags[currentWordIndex][currentTagIndex] = prevTagIndex1;
 											}
 											tagGramCoded += 0x100L;
 										}
 
-										if ((gramCount<currentWordIndex?gramCount:currentWordIndex) < 2)
+										if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 2)
 											break;
 										tagGramCoded &= 0xFFFFFFFFFFFF00FFL;
 										tagGramCoded += 0x10100L;
 									}
-									if ((gramCount<currentWordIndex?gramCount:currentWordIndex) < 3)
+									if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 3)
 										break;
 									tagGramCoded &= 0xFFFFFFFFFF0000FFL;
 									tagGramCoded += 0x1010100L;
 								}
-								if ((gramCount<currentWordIndex?gramCount:currentWordIndex) < 4)
+								if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 4)
 									break;
 								tagGramCoded &= 0xFFFFFFFF000000FFL;
 								tagGramCoded += 0x101010100L;
 							}
-							if ((gramCount<currentWordIndex?gramCount:currentWordIndex) < 5)
+							if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 5)
 								break;
 							tagGramCoded &= 0xFFFFFF00000000FFL;
 							tagGramCoded += 0x10101010100L;
 						}
-						if ((gramCount<currentWordIndex?gramCount:currentWordIndex) < 6)
+						if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 6)
 							break;
 						tagGramCoded &= 0xFFFF0000000000FFL;
 						tagGramCoded += 0x1010101010100L;
 					}
-					if ((gramCount<currentWordIndex?gramCount:currentWordIndex) < 7)
+					if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 7)
 						break;
 					tagGramCoded &= 0xFF000000000000FFL;
 					tagGramCoded += 0x101010101010100L;
 				}
-				pathProbs[currentWordIndex + 1][currentTagIndex] = maxProb + getEmitProb((byte)(currentTagIndex+1), featureVector);
+				pathProbs[currentWordIndex + 1][currentTagIndex] = maxProb + getEmitProb((byte) (currentTagIndex + 1), featureVector);
 			}
 
 
 		}
 
-//double resultProb = 0;
 		double resultProb = 0;
-		double currentProb = 0;
-		for (
-				byte i = 0;
-				i < tagSet.size(); i++)
-
+		double currentProb;
+		byte lastTagIndex = 0;
+		for (byte i = 0; i < tagSet.size(); i++)
 		{
 			currentProb = pathProbs[sentence.length()][i];
 			if (currentProb > resultProb) {
 				resultProb = currentProb;
-				bestTags[sentence.length() - 1] = i;
+				//bestTags[sentence.length() - 1] = i;
+				lastTagIndex = i;
 			}
 		}
+		byte[] resultTags = new byte[sentence.length()];
+		byte nextTagIndex = lastTagIndex;
+		for (int i = sentence.length()-1; i>=0; i--) {
+			resultTags[i] = (byte)(nextTagIndex + 1);
+			nextTagIndex = sourceTags[i][nextTagIndex];
+		}
 
-		sentence.setTags(bestTags);
+		sentence.setTags(resultTags);
 		return sentence;
 
 	}
 
 	//private double getTransitionProb(long tags) {
+	// TODO: Smoothing!
 	//	return transitionProbs.get((prevTags << tagSet.tagBoundBitCount) + currentTag);
 	//}
 

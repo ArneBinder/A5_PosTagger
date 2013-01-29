@@ -9,6 +9,8 @@ public class TagSet {
 	public static final int tagBound = 128;
 	public static final int tagBoundBitCount = 8;
 
+	//TODO: tagListe fuellen!
+
 	/**
 	 * tagMap contains a mapping from tag strings to byte indices (Attention: 1 .. (tagBound-1))
 	 */

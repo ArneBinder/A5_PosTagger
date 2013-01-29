@@ -20,7 +20,7 @@ public class Helper {
 	 */
 
 	static {
-		//TODO: tagListe fuellen!
+
 		//tagMap.put("as", (byte)0);
 
 		gramMask.put(1, 0xFFL);
