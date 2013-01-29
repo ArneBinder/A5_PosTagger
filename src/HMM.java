@@ -271,6 +271,7 @@ public class HMM {
 					int listLength = readInteger(br);
 					for (int i = 0; i < listLength; i++) {
 
+						emissionProbs[posTagIndex][featureIndex].put(readString(br), (double)readInteger(br));
 
 					}
 				}
@@ -338,7 +339,7 @@ public class HMM {
 			int c = br.read();
 			while (c != 44)
 			{
-				word = word + c;
+				word = word + 'c';
 				c = br.read();
 			}
 		} catch (IOException e) {
