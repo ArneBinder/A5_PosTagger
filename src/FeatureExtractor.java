@@ -26,9 +26,9 @@ public class FeatureExtractor {
 		boolean bos = n == 0;
 		boolean eos = (n + 1) >= sentence.length();
 
-		String tokenCat = tokenCat(n);
-		String prevTokenCat = bos ? null : tokenCat(n - 1);
-		String nextTokenCat = eos ? null : tokenCat(n + 1);
+		String tokenCat = categorize(sentence.getWord(n));
+		String prevTokenCat = bos ? null : categorize(sentence.getWord(n-1));
+		String nextTokenCat = eos ? null : categorize(sentence.getWord(n+1));
 
 		String token = normToken(sentence.getWord(n));
 		String prevToken = bos ? null : normToken(sentence.getWord(n - 1));
@@ -141,9 +141,6 @@ public class FeatureExtractor {
 	} */
 
 
-	public String tokenCat(int n) {
-		return IndoEuropeanTokenCategorizer.CATEGORIZER.categorize(token(n));
-	}
 
 
 	// unfolding this would go faster with less GC
@@ -174,5 +171,35 @@ public class FeatureExtractor {
 		for (int i = s.length() - numSuffixes; i < s.length(); ++i)
 			result.add(s.substring(i));
 		return result;
+	}
+
+	public String categorize(String token) {
+		char[] chars = token.toCharArray();
+		if (chars.length == 0) return NULL_CLASS;
+		if (Strings.allDigits(chars,0,chars.length)) {
+			if (chars.length == 1) return ONE_DIGIT_CLASS;
+			if (chars.length == 2) return TWO_DIGIT_CLASS;
+			if (chars.length == 3) return THREE_DIGIT_CLASS;
+			if (chars.length == 4) return FOUR_DIGIT_CLASS;
+			return FIVE_PLUS_DIGITS_CLASS;
+		}
+		if (Strings.containsDigits(chars)) {
+			if (Strings.containsLetter(chars)) return DIGITS_LETTERS_CLASS;
+			if (token.indexOf('-') >= 0) return DIGITS_DASH_CLASS;
+			if (token.indexOf('/') >= 0) return DIGITS_SLASH_CLASS;
+			if (token.indexOf(',') >= 0) return DIGITS_COMMA_CLASS;
+			if (token.indexOf('.') >= 0) return DIGITS_PERIOD_CLASS;
+			return MISC_DIGITS_CLASS;
+		}
+		if (Strings.allPunctuation(chars)) return PUNCTUATION_CLASS;
+		if (Character.isUpperCase(chars[0])
+				&& chars.length == 1) return ONE_UPPERCASE_CLASS;
+		if (Character.isLowerCase(chars[0])
+				&& chars.length == 1) return ONE_LOWERCASE_CLASS;
+		if (Strings.allUpperCase(chars)) return UPPERCASE_CLASS;
+		if (Strings.allLowerCase(chars)) return LOWERCASE_CLASS;
+		if (Strings.capitalized(chars)) return CAPITALIZED_CLASS;
+		if (Strings.allLetters(chars)) return MIXEDCASE_CLASS;
+		return OTHER_CLASS;
 	}
 }
