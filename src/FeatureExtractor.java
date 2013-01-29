@@ -11,6 +11,30 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class FeatureExtractor {
+	private static final String NULL_CLASS = "NULL-TOK";
+	private static final String ONE_DIGIT_CLASS = "1-DIG";
+	private static final String TWO_DIGIT_CLASS = "2-DIG";
+	private static final String THREE_DIGIT_CLASS = "3-DIG";
+	private static final String FOUR_DIGIT_CLASS = "4-DIG";
+	private static final String FIVE_PLUS_DIGITS_CLASS = "5+-DIG";
+	private static final String DIGITS_LETTERS_CLASS = "DIG-LET";
+	private static final String MISC_DIGITS_CLASS = "DIG-MSC";
+
+	private static final String DIGITS_DASH_CLASS = "DIG--";
+	private static final String DIGITS_SLASH_CLASS = "DIG-/";
+	private static final String DIGITS_COMMA_CLASS = "DIG-,";
+	private static final String DIGITS_PERIOD_CLASS = "DIG-.";
+	private static final String UPPERCASE_CLASS = "LET-UP";
+	private static final String LOWERCASE_CLASS = "LET-LOW";
+	private static final String CAPITALIZED_CLASS = "LET-CAP";
+	private static final String MIXEDCASE_CLASS = "LET-MIX";
+	private static final String ONE_UPPERCASE_CLASS = "1-LET-UP";
+	private static final String ONE_LOWERCASE_CLASS = "1-LET-LOW";
+	private static final String PUNCTUATION_CLASS = "PUNC-";
+
+	private static final String OTHER_CLASS = "OTHER";
+
+
 	public static int featureSize = 34;
 
 	public FeatureVector getFeatures(Sentence sentence, int n) {
