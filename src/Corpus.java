@@ -109,9 +109,9 @@ public class Corpus {
 		return result;
 	}
 
-	public Corpus getEvaluationCorpus(int excludeIndex){
+	public Corpus getEvaluationCorpus(int index){
 		Corpus result = new Corpus(tagSet);
-		result.content.addAll(partition[excludeIndex]);
+		result.content.addAll(partition[index]);
 		return result;
 	}
 
