@@ -211,8 +211,7 @@ public class HMM {
 		double resultProb = 0;
 		double currentProb;
 		byte lastTagIndex = 0;
-		for (byte i = 0; i < tagSet.size(); i++)
-		{
+		for (byte i = 0; i < tagSet.size(); i++) {
 			currentProb = pathProbs[sentence.length()][i];
 			if (currentProb > resultProb) {
 				resultProb = currentProb;
@@ -222,8 +221,8 @@ public class HMM {
 		}
 		byte[] resultTags = new byte[sentence.length()];
 		byte nextTagIndex = lastTagIndex;
-		for (int i = sentence.length()-1; i>=0; i--) {
-			resultTags[i] = (byte)(nextTagIndex + 1);
+		for (int i = sentence.length() - 1; i >= 0; i--) {
+			resultTags[i] = (byte) (nextTagIndex + 1);
 			nextTagIndex = sourceTags[i][nextTagIndex];
 		}
 
@@ -252,129 +251,102 @@ public class HMM {
 	/**
 	 * read model (from file))
 	 */
-	public void readModelFromFile() {
-		//TODO: implement!
+	public void readModelFromFile(String fileName) {
+		DataInputStream inputStream;
+		try {
+			inputStream = new DataInputStream(new FileInputStream(fileName));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			return;
+		}
 
 
-		BufferedReader br = new BufferedReader(new FileReader(new File(fileName)));
-
-
-		// write emissionProbs
 		// pos-tag x feature-index x feature-value --> probability
 		try {
-			int tagSetSize = readInteger(br);
+			// read tagSet
+			int tagSetSize = inputStream.readInt();
+			char[] tags = new char[tagSetSize];
+			for (int i = 0; i < tagSetSize; i++) {
+				tags[i] = inputStream.readChar();
+			}
+			tagSet = new TagSet(String.valueOf(tags));
 
-
+			// read emissionProbs
+			emissionProbs = new HashMap[tagSetSize][FeatureExtractor.featureSize];
+			// pos-tag x feature-index x feature-value --> probability
 			for (int posTagIndex = 0; posTagIndex < tagSetSize; posTagIndex++) {
 				for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
-
-
-					int listLength = readInteger(br);
+					int listLength = inputStream.readInt();
+					emissionProbs[posTagIndex][featureIndex] = new HashMap<String, Double>(listLength);
 					for (int i = 0; i < listLength; i++) {
-
-						emissionProbs[posTagIndex][featureIndex].put(readString(br), (double)readInteger(br));
-
+						int strLength = inputStream.readByte();
+						char[] chars = new char[strLength];
+						for (int j = 0; j < strLength; j++) {
+							chars[i] = inputStream.readChar();
+						}
+						emissionProbs[posTagIndex][featureIndex].put(String.valueOf(chars),inputStream.readDouble());
 					}
 				}
 			}
+
+			// read transitionProbs
+			int transitionHashMapSize = inputStream.readInt();
+			transitionProbs = new HashMap<Long, Double>(transitionHashMapSize);
+			for (int i = 0; i < transitionHashMapSize; i++) {
+				long key = inputStream.readLong();
+				double value = inputStream.readDouble();
+				transitionProbs.put(key, value);
+			}
+
+
 		} catch (IOException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
 	}
 
-	/**
-	 * write model (to file)
-	 */
-	public void writeModelToFile() {
-		//TODO: implement!
-		//TODO: write also Tagset?!
-
-		DataOutputStream fwModel = new DataOutputStream(
-				new BufferedOutputStream(new FileOutputStream(filename)));
-
-		// write emissionProbs
-		// pos-tag x feature-index x feature-value --> probability
+	public void writeModelToFile(String fileName) {
+		DataOutputStream outputStream;
 		try {
-			fwModel.write(tagSet.size());
+			outputStream = new DataOutputStream(new FileOutputStream(fileName));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+			return;
+		}
 
+		try {
+			// write tagSet
+			char[] tagSetString = tagSet.toString().toCharArray();
+			outputStream.writeInt(tagSetString.length);
+			for (char c : tagSetString) {
+				outputStream.writeChar(c);
+			}
+
+			// write emissionProbs
+			// pos-tag x feature-index x feature-value --> probability
 			for (int posTagIndex = 0; posTagIndex < tagSet.size(); posTagIndex++) {
 				for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
 					//ein Eintrag! vorher anzahl speichern
-					fwModel.writeInt(emissionProbs[posTagIndex][featureIndex].size());
-
+					outputStream.writeInt((emissionProbs[posTagIndex][featureIndex].size()));
 					for (Map.Entry<String, Double> entry : emissionProbs[posTagIndex][featureIndex].entrySet()) {
-						String eintrag = entry.getKey();
-						fwModel.writeInt(eintrag.length());
-						fwModel.writeChars(eintrag);
+						char[] featureValue = entry.getKey().toCharArray();
+						outputStream.writeByte((byte) featureValue.length);
+						for (char c : featureValue) {
+							outputStream.writeChar(c);
+						}
+						outputStream.writeDouble(entry.getValue());
 					}
 				}
 			}
 
-			fwModel.write(transitionProbs.size());
+			//write transitionProbs
+			outputStream.writeInt(transitionProbs.size());
 			for (Map.Entry<Long, Double> entry : transitionProbs.entrySet()) {
-				Long eintrag = entry.getKey();
-				fwModel.writeLong(eintrag);
+				outputStream.writeLong(entry.getKey());
+				outputStream.writeDouble(entry.getValue());
 			}
 
-			for (byte posTagIndex = 0; posTagIndex < tagSet.size(); posTagIndex++) {
-				fwModel.writeChars(tagSet.tagToString(posTagIndex));
-				fwModel.writeByte(tagSet.tagToByte(tagSet.tagToString(posTagIndex)));
-			}
 		} catch (IOException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
-	}
-
-	private static int readInteger(BufferedReader br)
-	{
-		int value = 0;
-		int base = 1;
-		try {
-			int c = br.read();
-			while (c != 44)
-			{
-				value += base * (c - 48);
-				c = br.read();
-				base *= 10;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
-		return value;
-	}
-
-	private static long readLong(BufferedReader br)
-	{
-		long value = 0;
-		long base = 1;
-		try {
-			int c = br.read();
-			while (c != 44)
-			{
-				value += base * (c - 48);
-				c = br.read();
-				base *= 10;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
-		return value;
-	}
-
-	private static String readString(BufferedReader br)
-	{
-		String word = "";
-
-		try {
-			int c = br.read();
-			while (c != 44)
-			{
-				word = word + 'c';
-				c = br.read();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
-		return word;
 	}
 }
