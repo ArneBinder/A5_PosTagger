@@ -88,7 +88,7 @@ public class FeatureExtractor {
 		feats[7] = tokenCat;
 		if (!bos)
 			//feats.set("TOK_CAT_PREV_" + prevTokenCat, 1.0);
-			feats[8] = prevToken;
+			feats[8] = prevTokenCat;
 		//else feats[8] = "";
 		if (!eos)
 			//feats.set("TOK_CAT_NEXT_" + nextTokenCat, 1.0);
