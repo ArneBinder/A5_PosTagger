@@ -232,7 +232,6 @@ public class HMM {
 	}
 
 	private double getTransitionProb(long tags) {
-		// TODO: Smoothing!
 		try {
 			return transitionProbs.get(tags);
 		} catch (Exception e) {
@@ -245,8 +244,6 @@ public class HMM {
 		for (int i = 0; i < FeatureExtractor.featureSize; i++) {
 			// pos-tag x feature-index x feature-value --> probability
 			// TODO: implement weights!
-			// TODO: implement smoothing! (if value doesn't exist --> error at the moment)
-
 			try {
 				resultProb += emissionProbs[tag][i].get(featureVector.features[i]);
 			} catch (Exception e) {
