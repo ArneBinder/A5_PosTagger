@@ -1,4 +1,6 @@
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.text.Bidi;
 import java.util.HashMap;
 
@@ -31,6 +33,12 @@ public class Helper {
 		gramMask.put(5, 0xFFFFFFFFFFL);
 		gramMask.put(6, 0xFFFFFFFFFFFFL);
 		gramMask.put(7, 0xFFFFFFFFFFFFFFL);
+	}
+
+	public static String[] getFileList(String directoryPath){
+		File dir = new File(directoryPath);
+		String[] fileList = dir.list();
+		return fileList;
 	}
 
 	/*public static int ipow(int base, int exp)
