@@ -89,6 +89,11 @@ public class HMM {
 		/* emissionCounts by totalEmissions */
 		// pos-tag x feature-index x feature-value --> probability
 		emissionProbs = new HashMap[tagSet.size()][FeatureExtractor.featureSize];
+		for (int i = 0; i < tagSet.size(); i++) {
+			for (int j = 0; j < FeatureExtractor.featureSize; j++) {
+				emissionProbs[i][j] = new HashMap<String, Double>();
+			}
+		}
 		for (byte i = 0; i < FeatureExtractor.featureSize; i++) {
 			for (Multiset.Entry<Map.Entry<Byte, String>> entry : emissionCounts[i].entrySet()) {
 				byte posTag = entry.getElement().getKey();
