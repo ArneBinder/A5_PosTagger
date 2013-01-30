@@ -13,6 +13,7 @@ public class Helper {
 	static final int maxGramCount = 7;
 	static HashMap<Integer, Long> gramMask = new HashMap<Integer, Long>(maxGramCount);
 	static final char tagDelimiter = '/';
+	static final double smoothing = Math.log(0.01);
 
 	/**
 	 * max tag-value: 127

@@ -236,7 +236,7 @@ public class HMM {
 		try {
 			return transitionProbs.get(tags);
 		} catch (Exception e) {
-			return 0.01;
+			return Helper.smoothing;
 		}
 	}
 
@@ -250,7 +250,7 @@ public class HMM {
 			try {
 				resultProb += emissionProbs[tag][i].get(featureVector.features[i]);
 			} catch (Exception e) {
-				resultProb += 0.01;
+				resultProb += Helper.smoothing;
 			}
 		}
 		return resultProb;
