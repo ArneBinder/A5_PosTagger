@@ -289,25 +289,36 @@ public class HMM {
 		//TODO: implement!
 		//TODO: write also Tagset?!
 
-
-		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName)));
+		DataOutputStream fwModel = new DataOutputStream(
+				new BufferedOutputStream(new FileOutputStream(filename)));
 
 		// write emissionProbs
 		// pos-tag x feature-index x feature-value --> probability
 		try {
-			bw.write(tagSet.size() + ",");
+			fwModel.write(tagSet.size());
 
 			for (int posTagIndex = 0; posTagIndex < tagSet.size(); posTagIndex++) {
 				for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
 					//ein Eintrag! vorher anzahl speichern
-					bw.write(emissionProbs[posTagIndex][featureIndex].size() + ",");
+					fwModel.writeInt(emissionProbs[posTagIndex][featureIndex].size());
 
 					for (Map.Entry<String, Double> entry : emissionProbs[posTagIndex][featureIndex].entrySet()) {
 						String eintrag = entry.getKey();
-						bw.write(eintrag.length() + ",");
-						bw.write(eintrag + ",");
+						fwModel.writeInt(eintrag.length());
+						fwModel.writeChars(eintrag);
 					}
 				}
+			}
+
+			fwModel.write(transitionProbs.size());
+			for (Map.Entry<Long, Double> entry : transitionProbs.entrySet()) {
+				Long eintrag = entry.getKey();
+				fwModel.writeLong(eintrag);
+			}
+
+			for (byte posTagIndex = 0; posTagIndex < tagSet.size(); posTagIndex++) {
+				fwModel.writeChars(tagSet.tagToString(posTagIndex));
+				fwModel.writeByte(tagSet.tagToByte(tagSet.tagToString(posTagIndex)));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -318,6 +329,24 @@ public class HMM {
 	{
 		int value = 0;
 		int base = 1;
+		try {
+			int c = br.read();
+			while (c != 44)
+			{
+				value += base * (c - 48);
+				c = br.read();
+				base *= 10;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+		return value;
+	}
+
+	private static long readLong(BufferedReader br)
+	{
+		long value = 0;
+		long base = 1;
 		try {
 			int c = br.read();
 			while (c != 44)
