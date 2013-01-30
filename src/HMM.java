@@ -82,7 +82,7 @@ public class HMM {
 				}
 			}
 
-			System.out.println();
+			//System.out.println();
 		}
 
 		//// normieren //////////
@@ -99,7 +99,7 @@ public class HMM {
 				byte posTag = entry.getElement().getKey();
 				double logProb = Math.log(entry.getCount()) - Math.log(totalEmissions.count(posTag));
 				//int featureIndex = i;
-				emissionProbs[posTag][i].put(entry.getElement().getValue(), logProb);
+				emissionProbs[posTag-1][i].put(entry.getElement().getValue(), logProb);
 				// --> array aus posTagGram, featureIndex, featureValue, logProb
 
 			}
@@ -130,6 +130,7 @@ public class HMM {
 
 		float mean = (float) allTransitionCount / (float) transitionCounts.elementSet().size();
 		System.out.println("mean: " + mean);
+
 		//////////////////
 	}
 
@@ -207,7 +208,7 @@ public class HMM {
 					tagGramCoded &= 0xFF000000000000FFL;
 					tagGramCoded += 0x101010101010100L;
 				}
-				pathProbs[currentWordIndex + 1][currentTagIndex] = maxProb + getEmitProb((byte) (currentTagIndex + 1), featureVector);
+				pathProbs[currentWordIndex + 1][currentTagIndex] = maxProb + getEmitProb(currentTagIndex, featureVector);
 			}
 
 

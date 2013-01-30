@@ -19,6 +19,7 @@ public class TestCorpus {
 
 
 		corpus.writeContentToFile("outTest");
+		System.out.println("tagSet.size(): "+tagSet.size());
 		HMM hmm = new HMM(corpus, 2, tagSet);
 		//corpus.constructPartition(10);
 		hmm.train();
