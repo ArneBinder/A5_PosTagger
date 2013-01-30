@@ -233,7 +233,11 @@ public class HMM {
 
 	private double getTransitionProb(long tags) {
 		// TODO: Smoothing!
-		return transitionProbs.get(tags);
+		try {
+			return transitionProbs.get(tags);
+		} catch (Exception e) {
+			return 0.01;
+		}
 	}
 
 	private double getEmitProb(byte tag, FeatureVector featureVector) {
@@ -242,7 +246,12 @@ public class HMM {
 			// pos-tag x feature-index x feature-value --> probability
 			// TODO: implement weights!
 			// TODO: implement smoothing! (if value doesn't exist --> error at the moment)
-			resultProb += emissionProbs[tag][i].get(featureVector.features[i]);
+
+			try {
+				resultProb += emissionProbs[tag][i].get(featureVector.features[i]);
+			} catch (Exception e) {
+				resultProb += 0.01;
+			}
 		}
 		return resultProb;
 
