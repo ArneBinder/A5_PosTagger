@@ -45,7 +45,7 @@ public class HMM {
 	public void train() {
 		Multiset<Long> transitionCounts = HashMultiset.create();
 		Multiset<Long> totalTransitions = HashMultiset.create();
-		Multiset<Map.Entry<Byte, String>>[] emissionCounts = new Multiset[FeatureExtractor.featureSize]; // saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
+		Multiset<Pair<Byte, String>>[] emissionCounts = new Multiset[FeatureExtractor.featureSize]; // saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
 		Multiset<Byte> totalEmissions = HashMultiset.create(); //saves how often a posGram occurs in total
 		int allTransitionCount; //STATS
 		for (int i = 0; i < emissionCounts.length; i++) {
@@ -54,9 +54,16 @@ public class HMM {
 		allTransitionCount = 0;
 		long tagGram;
 		byte currentTag;
+		int[] lastSize = new int[FeatureExtractor.featureSize];
+		for (int i = 0; i < FeatureExtractor.featureSize; i++) {
+			lastSize[i] = 0;
+		}
 		FeatureExtractor featureExtractor = new FeatureExtractor();
+		int curSenIndex = 0;
+		System.out.println("corpus.size(): "+corpus.size());
 		for (Sentence sentence : corpus.getContent()) {
 			tagGram = 0;
+
 			for (int i = 0; i < sentence.length(); i++) {
 				allTransitionCount++;  //STATS
 				totalTransitions.add(tagGram);
@@ -76,15 +83,31 @@ public class HMM {
 				// Features des aktuellen Wortes extrahieren & (gramTag --> Features) zaehlen
 
 				FeatureVector featureVector = featureExtractor.getFeatures(sentence, i);
+
 				for (int j = 0; j < FeatureExtractor.featureSize; j++) {
 					//TODO: check, if Pair works correct
+					//lastSize[j] = emissionCounts[j].elementSet().size();
 					emissionCounts[j].add(new Pair<Byte, String>(currentTag/*tagGram*/, featureVector.features[j]));
-				}
-			}
 
+
+				}
+				//if(emissionCounts[4].elementSet().size() - lastSize[4] < 1)
+				//	System.out.println(emissionCounts[4].size()+((double)curSenIndex / (double)corpus.size()));
+
+			}
+			//System.out.println(curSenIndex);
+			curSenIndex++;
 			//System.out.println();
 		}
 
+		int countEmissionCount = 0;
+		int totalEmissionValues = 0;
+		for (int i = 0; i < FeatureExtractor.featureSize; i++) {
+			countEmissionCount += emissionCounts[i].elementSet().size();
+			totalEmissionValues += emissionCounts[i].size();
+		}
+		System.out.println("countEmissionCount: "+countEmissionCount);
+		System.out.println("total emnission values: "+totalEmissionValues);
 		//// normieren //////////
 		/* emissionCounts by totalEmissions */
 		// pos-tag x feature-index x feature-value --> probability
@@ -94,8 +117,10 @@ public class HMM {
 				emissionProbs[i][j] = new HashMap<String, Double>();
 			}
 		}
+		System.out.println("normalize emissionProbs...");
+		System.out.println();
 		for (byte i = 0; i < FeatureExtractor.featureSize; i++) {
-			for (Multiset.Entry<Map.Entry<Byte, String>> entry : emissionCounts[i].entrySet()) {
+			for (Multiset.Entry<Pair<Byte, String>> entry : emissionCounts[i].entrySet()) {
 				byte posTag = entry.getElement().getKey();
 				double logProb = Math.log(entry.getCount()) - Math.log(totalEmissions.count(posTag));
 				//int featureIndex = i;
@@ -103,7 +128,9 @@ public class HMM {
 				// --> array aus posTagGram, featureIndex, featureValue, logProb
 
 			}
+			//System.out.println();
 		}
+		System.out.println("emissionProbs done.");
 
 		/* transitionCounts by totalTransitions */
 		transitionProbs = new HashMap<Long, Double>();
@@ -115,14 +142,15 @@ public class HMM {
 			transitionProbs.put(entry.getElement(), logProb);
 
 		}
+		System.out.println("transitionProbs done.");
 		////////////////////////
 
 
 		////DEBUG & STATS
-		System.out.println();
-		for (Multiset.Entry<Long> entry : transitionCounts.entrySet()) {
-			System.out.println(tagSet.tagGramToString(entry.getElement()) + ": " + entry.getCount());
-		}
+		//System.out.println();
+		//for (Multiset.Entry<Long> entry : transitionCounts.entrySet()) {
+		//	System.out.println(tagSet.tagGramToString(entry.getElement()) + ": " + entry.getCount());
+		//}
 
 		System.out.println();
 		System.out.println("allTransitionCount: " + allTransitionCount);

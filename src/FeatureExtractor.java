@@ -148,6 +148,11 @@ public class FeatureExtractor {
 		//	feats.set("DICT_FULL", 1.0);
 		//if(dict.getDictEntries("Stop").contains(token))
 		//	feats.set("STOPWORD", 1.0);
+		/*for (String feat : feats) {
+			System.out.print(feat + ", ");
+		}
+		System.out.println();
+        */
 		FeatureVector featureVector = new FeatureVector(feats);
 		return featureVector;
 	}
