@@ -149,7 +149,6 @@ public class FeatureExtractor {
 		//if(dict.getDictEntries("Stop").contains(token))
 		//	feats.set("STOPWORD", 1.0);
 		FeatureVector featureVector = new FeatureVector(feats);
-		// Todo: implement getFeatures!
 		return featureVector;
 	}
 
