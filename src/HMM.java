@@ -269,7 +269,6 @@ public class HMM {
 			return;
 		}
 
-
 		// pos-tag x feature-index x feature-value --> probability
 		try {
 			// read tagSet
@@ -307,7 +306,6 @@ public class HMM {
 				transitionProbs.put(key, value);
 			}
 
-
 		} catch (IOException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
@@ -316,7 +314,7 @@ public class HMM {
 	public void writeModelToFile(String fileName) {
 		DataOutputStream outputStream;
 		try {
-			outputStream = new DataOutputStream(new FileOutputStream(fileName));
+			outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 			return;
