@@ -45,12 +45,20 @@ public class HMM {
 
 	}
 
+	HMM(String fileName){
+		readModelFromFile(fileName);
+	}
+
 	public Corpus getCorpus() {
 		return corpus;
 	}
 
 	public void setCorpus(Corpus corpus) {
 		this.corpus = corpus;
+	}
+
+	public TagSet getTagSet() {
+		return tagSet;
 	}
 
 	public void train() {
@@ -357,6 +365,9 @@ public class HMM {
 
 		// pos-tag x feature-index x feature-value --> probability
 		try {
+			// read gramCount
+			gramCount = inputStream.readInt();
+
 			// read tagSet
 			int tagSetSize = inputStream.readInt();
 			char[] tags = new char[tagSetSize];
@@ -408,6 +419,9 @@ public class HMM {
 		}
 
 		try {
+			//write gramCount
+			outputStream.writeInt(gramCount);
+
 			// write tagSet
 			char[] tagSetString = tagSet.toString().toCharArray();
 			outputStream.writeInt(tagSetString.length);

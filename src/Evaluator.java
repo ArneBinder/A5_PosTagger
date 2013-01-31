@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Arne
@@ -43,6 +47,58 @@ public class Evaluator {
 				f++;
 			}
 		}
+
+	}
+
+
+	public static void main(String[] args) {
+		final int partitionCount = 10;
+		long startTime = System.currentTimeMillis();
+		TagSet tagSet = new TagSet("");
+		Corpus corpus = new Corpus(tagSet);
+		int i = 0;
+		for (String fileName : Helper.getFileList("brown_learn")) {
+			//System.out.println(brown_learn);
+			corpus.addContentFromFile("brown_learn\\" + fileName);
+			//if(i>100)
+			//	break;
+			i++;
+		}
+
+		long corpusCreated = System.currentTimeMillis();
+		System.out.println("corpus created after " + (corpusCreated - startTime) + "ms");
+		System.out.println("total size: " + corpus.size() + " sentences.");
+		//corpus.writeContentToFile("outTest");
+		System.out.println("tagSet.size(): " + tagSet.size());
+
+		System.out.println("construct partition...");
+		corpus.constructPartition(partitionCount);
+
+		double fSum = 0;
+		List<Double> fMeasures = new ArrayList<Double>();
+		for (int j = 0; j < partitionCount; j++) {
+			Corpus trainCorpus = corpus.getTrainCorpus(i);
+			Corpus evalCorpus = corpus.getEvaluationCorpus(i);
+
+			HMM hmm = new HMM(trainCorpus, 1, tagSet);
+			System.out.println("HMM initialized.");
+			System.out.println("start training...");
+			long startTagging = System.currentTimeMillis();
+			hmm.setCorpus(evalCorpus);
+			Corpus taggedEvalCorpus = hmm.tag();
+			long hmmTagged = System.currentTimeMillis();
+			System.out.println("tagging done. " + (hmmTagged - startTagging) + "ms");
+			Evaluator evaluator = new Evaluator();
+			double fMeasure = evaluator.getFMeasure(corpus.getEvaluationCorpus(i), taggedEvalCorpus);
+			fSum += fMeasure;
+			System.out.println("F-Measure: " + fMeasure);
+		}
+		Collections.sort(fMeasures);
+		System.out.println(fMeasures);
+		double median = fMeasures.get((partitionCount / 2));
+		double mean = fSum / partitionCount;
+		System.out.println("mean: "+mean);
+		System.out.println("median: "+median);
 
 	}
 
