@@ -34,8 +34,9 @@ public class FeatureExtractor {
 
 	private static final String OTHER_CLASS = "OTHER";
 
-
-	public static int featureSize = 34;
+	static int MAX_PREFIX_LENGTH = 2;
+	static int MAX_SUFFIX_LENGTH = 2;
+	public static int featureSize = 10+3*(MAX_SUFFIX_LENGTH+MAX_PREFIX_LENGTH);
 
 	public FeatureVector getFeatures(Sentence sentence, int n) {
 
@@ -172,7 +173,7 @@ public class FeatureExtractor {
 
 
 	// unfolding this would go faster with less GC
-	static int MAX_PREFIX_LENGTH = 4;
+
 
 	static List<String> prefixes(String s) {
 		int numPrefixes = Math.min(MAX_PREFIX_LENGTH, s.length());
@@ -187,7 +188,7 @@ public class FeatureExtractor {
 	}
 
 	// unfolding this would go faster with less GC
-	static int MAX_SUFFIX_LENGTH = 4;
+
 
 	static List<String> suffixes(String s) {
 		int numSuffixes = Math.min(s.length(), MAX_SUFFIX_LENGTH);

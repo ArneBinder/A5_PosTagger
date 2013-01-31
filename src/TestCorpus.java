@@ -67,16 +67,16 @@ public class TestCorpus {
 		System.out.println("start training...");
 
 
-		HMM hmm = new HMM(corpus, 2, tagSet);
+		HMM hmm = new HMM(corpus, 3, tagSet);
 		//corpus.constructPartition(10);
 		hmm.train();
 		long hmmTrained = System.currentTimeMillis();
 		System.out.println("hmm trained after "+(hmmTrained-corpusCreated) +"ms");
 		//System.out.println("".split("/").length);
 		System.out.println();
-		System.out.println(tagSet);
-		TagSet tagSet1 = new TagSet(tagSet.toString());
-		System.out.println(tagSet1);
+		//System.out.println(tagSet);
+		//TagSet tagSet1 = new TagSet(tagSet.toString());
+		//System.out.println(tagSet1);
 
 	}
 }
