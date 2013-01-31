@@ -37,10 +37,13 @@ public class HMM {
 	//////// Methods ///////////
 
 	HMM(Corpus corpus, int gramCount, TagSet tagSet) {
+		//System.out.println(gramCount);
+		//System.out.println(Helper.maxGramCount);
 		assert gramCount <= Helper.maxGramCount : "given gram count = " + gramCount + " is bigger than max gram count = " + Helper.maxGramCount + ".";
 		this.corpus = corpus;
 		this.gramCount = gramCount;
 		this.tagSet = tagSet;
+
 	}
 
 	public Corpus getCorpus() {
@@ -52,6 +55,7 @@ public class HMM {
 	}
 
 	public void train() {
+		System.out.println("corpus.size(): "+corpus.size());
 		Multiset<Long> transitionCounts = HashMultiset.create();
 		Multiset<Long> totalTransitions = HashMultiset.create();
 		Multiset<Pair<Byte, String>>[] emissionCounts = new Multiset[FeatureExtractor.featureSize]; // saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
@@ -69,10 +73,15 @@ public class HMM {
 		}
 		FeatureExtractor featureExtractor = new FeatureExtractor();
 		int curSenIndex = 0;
-		System.out.println("corpus.size(): "+corpus.size());
+		long time = System.currentTimeMillis();
 		for (Sentence sentence : corpus.getContent()) {
 			tagGram = 0;
-
+			//System.out.print(".");
+			if(curSenIndex % 1000 == 0){
+				//System.out.println();
+				System.out.println(curSenIndex+"\t"+(System.currentTimeMillis() - time)+"ms");
+				time =System.currentTimeMillis();
+			}
 			for (int i = 0; i < sentence.length(); i++) {
 				allTransitionCount++;  //STATS
 				totalTransitions.add(tagGram);
@@ -120,6 +129,7 @@ public class HMM {
 		//// normieren //////////
 		/* emissionCounts by totalEmissions */
 		// pos-tag x feature-index x feature-value --> probability
+		//int t = tagSet.size();
 		emissionProbs = new HashMap[tagSet.size()][FeatureExtractor.featureSize];
 		for (int i = 0; i < tagSet.size(); i++) {
 			for (int j = 0; j < FeatureExtractor.featureSize; j++) {
@@ -372,6 +382,7 @@ public class HMM {
 				double value = inputStream.readDouble();
 				transitionProbs.put(key, value);
 			}
+			inputStream.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -419,6 +430,8 @@ public class HMM {
 				outputStream.writeDouble(entry.getValue());
 			}
 
+			outputStream.flush();
+			outputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}

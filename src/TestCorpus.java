@@ -15,10 +15,10 @@ public class TestCorpus {
 		long startTime = System.currentTimeMillis();
 		TagSet tagSet = new TagSet("");
 		Corpus corpus = new Corpus(tagSet);
-		int i =0;
+		int i = 0;
 		for (String fileName : Helper.getFileList("brown_learn")) {
 			//System.out.println(brown_learn);
-			corpus.addContentFromFile("brown_learn\\"+fileName);
+			corpus.addContentFromFile("brown_learn\\" + fileName);
 			//if(i>100)
 			//	break;
 			i++;
@@ -34,11 +34,18 @@ public class TestCorpus {
 		corpus.addContentFromFile("brown_learn\\ca07");
 		*/
 		long corpusCreated = System.currentTimeMillis();
-		System.out.println("corpus created after "+(corpusCreated-startTime) +"ms");
-		System.out.println("total size: "+corpus.size()+" sentences.");
+		System.out.println("corpus created after " + (corpusCreated - startTime) + "ms");
+		System.out.println("total size: " + corpus.size() + " sentences.");
 		//corpus.writeContentToFile("outTest");
 		//System.out.println("tagSet.size(): "+tagSet.size());
 
+		/*Feature f1 = new Feature("abc", (byte) 5);
+		Feature f2 = new Feature("abc", (byte) 5);
+		HashSet<Feature> h = new HashSet<Feature>();
+		h.add(f1);
+		h.add(f2);
+		System.out.println("size: "+h.size());
+		*/
 		// HASH-PAIR-CHECK
 		/*String s1 = "abc";
 		String s2 = "bc";
@@ -73,17 +80,19 @@ public class TestCorpus {
 
 		System.out.println("start training...");
 		HMM hmm = new HMM(trainCorpus, 1, tagSet);
-		System.out.println(tagSet);
+		System.out.println("HMM initialized.");
+		//System.out.println(corpus.t);
+		//System.out.println("blub");
 		hmm.train();
 		long hmmTrained = System.currentTimeMillis();
-		System.out.println("hmm trained after "+(hmmTrained-corpusCreated) +"ms");
+		System.out.println("hmm trained after " + (hmmTrained - corpusCreated) + "ms");
 		System.out.println("start tagging...");
 		hmm.setCorpus(evalCorpus);
-		hmm.tag();
+		Corpus taggedEvalCorpus = hmm.tag();
 		long hmmTagged = System.currentTimeMillis();
-		System.out.println("tagging done. "+(hmmTagged-hmmTrained)+"ms");
+		System.out.println("tagging done. " + (hmmTagged - hmmTrained) + "ms");
 		Evaluator evaluator = new Evaluator();
-		System.out.println("F-Measure: "+evaluator.getFMeasure(corpus.getEvaluationCorpus(9), hmm.getCorpus()));
+		System.out.println("F-Measure: " + evaluator.getFMeasure(corpus.getEvaluationCorpus(9), taggedEvalCorpus));
 		//System.out.println("".split("/").length);
 
 		//System.out.println(tagSet);

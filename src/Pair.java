@@ -41,10 +41,11 @@ public class Pair<K, V> implements Map.Entry<K, V> {
 	public boolean equals(Object other){
 		if (other == null) return false;
 		if (other == this) return true;
-		if (!(other instanceof Pair))return false;
+		//if (!(other instanceof Pair))return false;
 		//if (!(((Pair)other).key instanceof key.getClass())) return false;
 		return ((Pair<K, V>)other).key.equals(key) && ((Pair<K, V>)other).value.equals(value);
 	}
+
 
 	@Override
 	public int hashCode() {
