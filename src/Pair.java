@@ -42,7 +42,7 @@ public class Pair<K, V> implements Map.Entry<K, V> {
 		if (other == null) return false;
 		if (other == this) return true;
 		if (!(other instanceof Pair))return false;
-		//System.out.println("EQUALTest");
+		//if (!(((Pair)other).key instanceof key.getClass())) return false;
 		return ((Pair<K, V>)other).key.equals(key) && ((Pair<K, V>)other).value.equals(value);
 	}
 

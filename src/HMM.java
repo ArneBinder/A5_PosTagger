@@ -28,9 +28,11 @@ public class HMM {
 	// pos-tag x feature-index x feature-value --> probability
 	HashMap<String, Double>[][] emissionProbs;
 
-	Corpus corpus;
-	int gramCount;
-	TagSet tagSet;
+
+
+	private Corpus corpus;
+	private int gramCount;
+	private TagSet tagSet;
 
 	//////// Methods ///////////
 
@@ -41,6 +43,13 @@ public class HMM {
 		this.tagSet = tagSet;
 	}
 
+	public Corpus getCorpus() {
+		return corpus;
+	}
+
+	public void setCorpus(Corpus corpus){
+		this.corpus = corpus;
+	}
 
 	public void train() {
 		Multiset<Long> transitionCounts = HashMultiset.create();
@@ -163,8 +172,10 @@ public class HMM {
 	}
 
 	public Corpus tag() {
+		System.out.println("sentences: "+corpus.size());
 		Corpus taggedCorpus = new Corpus(tagSet);
 		for (int i = 0; i < corpus.size(); i++) {
+			System.out.println(i+":");
 			taggedCorpus.setSentence(tagSentence(corpus.getSentence(i)), i);
 		}
 		return taggedCorpus;

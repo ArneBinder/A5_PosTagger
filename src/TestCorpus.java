@@ -19,8 +19,8 @@ public class TestCorpus {
 		for (String fileName : Helper.getFileList("brown_learn")) {
 			//System.out.println(brown_learn);
 			corpus.addContentFromFile("brown_learn\\"+fileName);
-			if(i>100)
-				break;
+			//if(i>100)
+			//	break;
 			i++;
 		}
 
@@ -39,7 +39,7 @@ public class TestCorpus {
 		//System.out.println("tagSet.size(): "+tagSet.size());
 
 		// HASH-PAIR-CHECK
-		String s1 = "abc";
+		/*String s1 = "abc";
 		String s2 = "bc";
 		s2 = "a"+s2;
 		byte b1 = 5;
@@ -63,17 +63,27 @@ public class TestCorpus {
 		hs2.add(s1);
 		hs2.add(s2);
 		System.out.println(hs2.size());
-
+        */
 		System.out.println("start training...");
 
+		corpus.constructPartition(10);
+		Corpus trainCorpus = corpus.getTrainCorpus(9);
+		Corpus evalCorpus = corpus.getEvaluationCorpus(9);
 
-		HMM hmm = new HMM(corpus, 3, tagSet);
-		//corpus.constructPartition(10);
+
+		HMM hmm = new HMM(trainCorpus, 2, tagSet);
 		hmm.train();
 		long hmmTrained = System.currentTimeMillis();
 		System.out.println("hmm trained after "+(hmmTrained-corpusCreated) +"ms");
+		System.out.println("start tagging...");
+		hmm.setCorpus(evalCorpus);
+		hmm.tag();
+		long hmmTagged = System.currentTimeMillis();
+		System.out.println("tagging done. "+(hmmTagged-hmmTrained)+"ms");
+		Evaluator evaluator = new Evaluator();
+		System.out.println("F-Measure: "+evaluator.getFMeasure(corpus.getEvaluationCorpus(9), hmm.getCorpus()));
 		//System.out.println("".split("/").length);
-		System.out.println();
+
 		//System.out.println(tagSet);
 		//TagSet tagSet1 = new TagSet(tagSet.toString());
 		//System.out.println(tagSet1);
