@@ -37,7 +37,7 @@ public class TestCorpus {
 		System.out.println("corpus created after " + (corpusCreated - startTime) + "ms");
 		System.out.println("total size: " + corpus.size() + " sentences.");
 		//corpus.writeContentToFile("outTest");
-		//System.out.println("tagSet.size(): "+tagSet.size());
+		System.out.println("tagSet.size(): "+tagSet.size());
 
 		/*Feature f1 = new Feature("abc", (byte) 5);
 		Feature f2 = new Feature("abc", (byte) 5);
@@ -72,6 +72,10 @@ public class TestCorpus {
 		hs2.add(s2);
 		System.out.println(hs2.size());
         */
+		System.out.println(tagSet);
+		TagSet tagSet1 = new TagSet(tagSet.toString());
+		System.out.println(tagSet1);
+
 
 		System.out.println("construct partition...");
 		corpus.constructPartition(10);
@@ -95,9 +99,6 @@ public class TestCorpus {
 		System.out.println("F-Measure: " + evaluator.getFMeasure(corpus.getEvaluationCorpus(9), taggedEvalCorpus));
 		//System.out.println("".split("/").length);
 
-		//System.out.println(tagSet);
-		//TagSet tagSet1 = new TagSet(tagSet.toString());
-		//System.out.println(tagSet1);
 
 	}
 }
