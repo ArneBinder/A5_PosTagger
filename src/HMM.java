@@ -129,14 +129,20 @@ public class HMM {
 		System.out.println("normalize emissionProbs...");
 		System.out.println();
 		for (byte i = 0; i < FeatureExtractor.featureSize; i++) {
+			//emissionCounts[i].entrySet().iterator()
 			for (Multiset.Entry<Pair<Byte, String>> entry : emissionCounts[i].entrySet()) {
+				int entryCount = entry.getCount();
 				byte posTag = entry.getElement().getKey();
-				double logProb = Math.log(entry.getCount()) - Math.log(totalEmissions.count(posTag));
+				double logProb = Math.log(entryCount) - Math.log(totalEmissions.count(posTag));
 				//int featureIndex = i;
 				emissionProbs[posTag-1][i].put(entry.getElement().getValue(), logProb);
+				//if(emissionCounts[i].remove(entry.getElement(), entryCount)>0)
+				//	System.out.println("removed");
 				// --> array aus posTagGram, featureIndex, featureValue, logProb
 
 			}
+			emissionCounts[i] = HashMultiset.create();
+			System.out.println(emissionCounts[i].size());
 			//System.out.println();
 		}
 		System.out.println("emissionProbs done.");
@@ -218,9 +224,9 @@ public class HMM {
 											double currentProb = pathProbs[currentWordIndex][currentTagIndex] + getTransitionProb(tagGramCoded);
 
 											if (currentProb > maxProb) {
-												System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentProb+" max: "+maxProb);
+												//System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentProb+" max: "+maxProb);
 												maxProb = currentProb;
-												System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentProb+" max: "+maxProb);
+												//System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentProb+" max: "+maxProb);
 												sourceTags[currentWordIndex][currentTagIndex] = prevTagIndex1;
 											}
 											tagGramCoded += 0x100L;

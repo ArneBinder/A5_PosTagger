@@ -19,8 +19,8 @@ public class TestCorpus {
 		for (String fileName : Helper.getFileList("brown_learn")) {
 			//System.out.println(brown_learn);
 			corpus.addContentFromFile("brown_learn\\"+fileName);
-			if(i>100)
-				break;
+			//if(i>100)
+			//	break;
 			i++;
 		}
 
@@ -35,6 +35,7 @@ public class TestCorpus {
 		*/
 		long corpusCreated = System.currentTimeMillis();
 		System.out.println("corpus created after "+(corpusCreated-startTime) +"ms");
+		System.out.println("total size: "+corpus.size()+" sentences.");
 		//corpus.writeContentToFile("outTest");
 		//System.out.println("tagSet.size(): "+tagSet.size());
 
@@ -64,13 +65,13 @@ public class TestCorpus {
 		hs2.add(s2);
 		System.out.println(hs2.size());
         */
-		System.out.println("start training...");
 
+		System.out.println("construct partition...");
 		corpus.constructPartition(10);
 		Corpus trainCorpus = corpus.getTrainCorpus(9);
 		Corpus evalCorpus = corpus.getEvaluationCorpus(9);
 
-
+		System.out.println("start training...");
 		HMM hmm = new HMM(trainCorpus, 1, tagSet);
 		System.out.println(tagSet);
 		hmm.train();
