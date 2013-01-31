@@ -176,7 +176,7 @@ public class HMM {
 		Corpus taggedCorpus = new Corpus(tagSet);
 		for (int i = 0; i < corpus.size(); i++) {
 			System.out.println(i+":");
-			taggedCorpus.setSentence(tagSentence(corpus.getSentence(i)), i);
+			taggedCorpus.addSentence(tagSentence(corpus.getSentence(i)));
 		}
 		return taggedCorpus;
 	}

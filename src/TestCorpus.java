@@ -19,8 +19,8 @@ public class TestCorpus {
 		for (String fileName : Helper.getFileList("brown_learn")) {
 			//System.out.println(brown_learn);
 			corpus.addContentFromFile("brown_learn\\"+fileName);
-			//if(i>100)
-			//	break;
+			if(i>100)
+				break;
 			i++;
 		}
 
