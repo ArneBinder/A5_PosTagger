@@ -115,7 +115,7 @@ public class HMM {
 				for (int j = 0; j < FeatureExtractor.featureSize; j++) {
 					//TODO: check, if Pair works correct
 					//lastSize[j] = emissionCounts[j].elementSet().size();
-					emissionCounts[j][currentTag].add(featureVector.features[j]);
+					emissionCounts[j][currentTag-1].add(featureVector.features[j]);
 
 
 				}
