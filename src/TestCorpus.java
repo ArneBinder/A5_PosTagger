@@ -71,7 +71,8 @@ public class TestCorpus {
 		Corpus evalCorpus = corpus.getEvaluationCorpus(9);
 
 
-		HMM hmm = new HMM(trainCorpus, 2, tagSet);
+		HMM hmm = new HMM(trainCorpus, 1, tagSet);
+		System.out.println(tagSet);
 		hmm.train();
 		long hmmTrained = System.currentTimeMillis();
 		System.out.println("hmm trained after "+(hmmTrained-corpusCreated) +"ms");
