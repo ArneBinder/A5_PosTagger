@@ -66,7 +66,7 @@ public class HMM {
 		Multiset<Long> transitionCounts = HashMultiset.create();
 		Multiset<Long> totalTransitions = HashMultiset.create();
 		Multiset<String>[][] emissionCounts = new Multiset[FeatureExtractor.featureSize][tagSet.size()]; // saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
-		Multiset<Short> totalEmissions = HashMultiset.create(); //saves how often a posGram occurs in total
+		Multiset<Byte> totalEmissions = HashMultiset.create(); //saves how often a posGram occurs in total
 		int allTransitionCount; //STATS
 		for (int i = 0; i < emissionCounts.length; i++) {
 			for (int j = 0; j < tagSet.size(); j++) {
@@ -76,7 +76,7 @@ public class HMM {
 		}
 		allTransitionCount = 0;
 		long tagGram;
-		short currentTag;
+		byte currentTag;
 		int[] lastSize = new int[FeatureExtractor.featureSize];
 		for (int i = 0; i < FeatureExtractor.featureSize; i++) {
 			lastSize[i] = 0;
@@ -219,9 +219,9 @@ public class HMM {
 	private Sentence tagSentence(Sentence sentence) {
 		FeatureExtractor featureExtractor = new FeatureExtractor();
 		double[][] pathProbs = new double[sentence.length() + 1][tagSet.size()];
-		short[][] sourceTags = new short[sentence.length()][tagSet.size()];
+		byte[][] sourceTags = new byte[sentence.length()][tagSet.size()];
 		// set initial transition probabilities
-		for (short i = 0; i < tagSet.size(); i++) {
+		for (byte i = 0; i < tagSet.size(); i++) {
 			pathProbs[0][i] = getTransitionProb(i);
 			//System.out.println(pathProbs[0][i]);
 		}
@@ -233,18 +233,18 @@ public class HMM {
 		for (int currentWordIndex = 0; currentWordIndex < sentence.length(); currentWordIndex++) {
 			String word = sentence.getWord(currentWordIndex);
 			FeatureVector featureVector = featureExtractor.getFeatures(sentence, currentWordIndex);
-			for (short currentTagIndex = 0; currentTagIndex < tagSet.size(); currentTagIndex++) {
+			for (byte currentTagIndex = 0; currentTagIndex < tagSet.size(); currentTagIndex++) {
 				double maxProb = -Double.MAX_VALUE;
 				//System.out.println(maxProb);
 				tagGramCoded++;
 				// for all possible tagGrams (sources) do...
-				for (short prevTagIndex7 = 0; prevTagIndex7 < tagSet.size(); prevTagIndex7++) {
-					for (short prevTagIndex6 = 0; prevTagIndex6 < tagSet.size(); prevTagIndex6++) {
-						for (short prevTagIndex5 = 0; prevTagIndex5 < tagSet.size(); prevTagIndex5++) {
-							for (short prevTagIndex4 = 0; prevTagIndex4 < tagSet.size(); prevTagIndex4++) {
-								for (short prevTagIndex3 = 0; prevTagIndex3 < tagSet.size(); prevTagIndex3++) {
-									for (short prevTagIndex2 = 0; prevTagIndex2 < tagSet.size(); prevTagIndex2++) {
-										for (short prevTagIndex1 = 0; prevTagIndex1 < tagSet.size(); prevTagIndex1++) {
+				for (byte prevTagIndex7 = 0; prevTagIndex7 < tagSet.size(); prevTagIndex7++) {
+					for (byte prevTagIndex6 = 0; prevTagIndex6 < tagSet.size(); prevTagIndex6++) {
+						for (byte prevTagIndex5 = 0; prevTagIndex5 < tagSet.size(); prevTagIndex5++) {
+							for (byte prevTagIndex4 = 0; prevTagIndex4 < tagSet.size(); prevTagIndex4++) {
+								for (byte prevTagIndex3 = 0; prevTagIndex3 < tagSet.size(); prevTagIndex3++) {
+									for (byte prevTagIndex2 = 0; prevTagIndex2 < tagSet.size(); prevTagIndex2++) {
+										for (byte prevTagIndex1 = 0; prevTagIndex1 < tagSet.size(); prevTagIndex1++) {
 
 											//for all current possible tags (target) do...
 											//System.out.println(getTransitionProb(tagGramCoded));
@@ -300,15 +300,15 @@ public class HMM {
 
 		for (int i = 0; i < sentence.length(); i++) {
 			for (int j = 0; j < tagSet.size(); j++) {
-				System.out.print(tagSet.tagToString((short) (sourceTags[i][j] + 1)) + "\t");
+				System.out.print(tagSet.tagToString((byte) (sourceTags[i][j] + 1)) + "\t");
 			}
 			System.out.println();
 		}
 
 		double resultProb = 0;
 		double currentProb;
-		short lastTagIndex = 0;
-		for (short i = 0; i < tagSet.size(); i++) {
+		byte lastTagIndex = 0;
+		for (byte i = 0; i < tagSet.size(); i++) {
 			currentProb = pathProbs[sentence.length()][i];
 			if (currentProb > resultProb) {
 				resultProb = currentProb;
@@ -316,10 +316,10 @@ public class HMM {
 				lastTagIndex = i;
 			}
 		}
-		short[] resultTags = new short[sentence.length()];
-		short nextTagIndex = lastTagIndex;
+		byte[] resultTags = new byte[sentence.length()];
+		byte nextTagIndex = lastTagIndex;
 		for (int i = sentence.length() - 1; i >= 0; i--) {
-			resultTags[i] = (short) (nextTagIndex + 1);
+			resultTags[i] = (byte) (nextTagIndex + 1);
 			nextTagIndex = sourceTags[i][nextTagIndex];
 		}
 
@@ -336,7 +336,7 @@ public class HMM {
 		}
 	}
 
-	private double getEmitProb(short tag, FeatureVector featureVector) {
+	private double getEmitProb(byte tag, FeatureVector featureVector) {
 		double resultProb = 0;
 		for (int i = 0; i < FeatureExtractor.featureSize; i++) {
 			// pos-tag x feature-index x feature-value --> probability

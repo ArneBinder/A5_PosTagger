@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class Sentence {
 	private String[] words;
-	private short[] tags;
+	private byte[] tags;
 	private int length;
 	private TagSet tagSet;
 
@@ -26,7 +26,7 @@ public class Sentence {
 		return words[index];
 	}
 
-	public short[] getTags() {
+	public byte[] getTags() {
 		return tags;
 	}
 
@@ -36,7 +36,7 @@ public class Sentence {
 		String[] tempWords = sentence.split(" ");
 		length = tempWords.length;
 		this.words = new String[length];
-		this.tags = new short[length];
+		this.tags = new byte[length];
 		String[] taggedWord;
 		for (int i = 0; i < length; i++) {
 			if (tempWords[i].contains(Helper.tagDelimiter + "")) {
@@ -65,7 +65,7 @@ public class Sentence {
 		return result;
 	}
 
-	public void setTags(short[] tags) {
+	public void setTags(byte[] tags) {
 		System.arraycopy(tags, 0, this.tags, 0, this.tags.length);
 	}
 
@@ -89,7 +89,7 @@ public class Sentence {
 		return result;
 	}
 
-	public short getTag(int index) {
+	public byte getTag(int index) {
 		return tags[index];
 	}
 
