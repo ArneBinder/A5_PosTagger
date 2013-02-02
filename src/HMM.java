@@ -263,27 +263,27 @@ public class HMM {
 				// for all possible tagGrams (sources) do...
 				for (byte prevTagIndex7 = 0; prevTagIndex7 < tagSet.size(); prevTagIndex7++) {
 					tagGramCoded &= 0xFF000000000000FFL;
-					if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 7)
+					if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 7)
 						tagGramCoded += 0x100000000000000L;
 					for (byte prevTagIndex6 = 0; prevTagIndex6 < tagSet.size(); prevTagIndex6++) {
 						tagGramCoded &= 0xFFFF0000000000FFL;
-						if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 6)
+						if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 6)
 							tagGramCoded += 0x1000000000000L;
 						for (byte prevTagIndex5 = 0; prevTagIndex5 < tagSet.size(); prevTagIndex5++) {
 							tagGramCoded &= 0xFFFFFF00000000FFL;
-							if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 5)
+							if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 5)
 								tagGramCoded += 0x10000000000L;
 							for (byte prevTagIndex4 = 0; prevTagIndex4 < tagSet.size(); prevTagIndex4++) {
 								tagGramCoded &= 0xFFFFFFFF000000FFL;
-								if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 4)
+								if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 4)
 									tagGramCoded += 0x100000000L;
 								for (byte prevTagIndex3 = 0; prevTagIndex3 < tagSet.size(); prevTagIndex3++) {
 									tagGramCoded &= 0xFFFFFFFFFF0000FFL;
-									if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 3)
+									if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 3)
 										tagGramCoded += 0x1000000L;
 									for (byte prevTagIndex2 = 0; prevTagIndex2 < tagSet.size(); prevTagIndex2++) {
 										tagGramCoded &= 0xFFFFFFFFFFFF00FFL;
-										if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 2)
+										if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 2)
 											tagGramCoded += 0x10000L;
 										for (byte prevTagIndex1 = 0; prevTagIndex1 < tagSet.size(); prevTagIndex1++) {
 											tagGramCoded += 0x100L;
