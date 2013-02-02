@@ -13,14 +13,15 @@ import java.util.HashSet;
 public class TestCorpus {
 	public static void main(String[] args) {
 		long startTime = System.currentTimeMillis();
+		final String directoryName = "brown_learn_1";
 		TagSet tagSet = new TagSet("");
 		Corpus corpus = new Corpus(tagSet);
 
-		for (String fileName : Helper.getFileList("brown_learn")) {
+		for (String fileName : Helper.getFileList(directoryName)) {
 			//System.out.println(brown_learn);
-			corpus.addContentFromFile("brown_learn\\" + fileName);
-			if(corpus.size() > 40000)
-				break;
+			corpus.addContentFromFile(directoryName+"\\" + fileName);
+			//if(corpus.size() > 0)//45000)
+			//	break;
 		}
 
 		long corpusCreated = System.currentTimeMillis();
@@ -29,12 +30,12 @@ public class TestCorpus {
 		//corpus.writeContentToFile("outTest");
 		System.out.println("tagSet.size(): "+tagSet.size());
 		System.out.println(tagSet);
-		TagSet t = new TagSet(tagSet.toString());
-		System.out.println(t);
+		//TagSet t = new TagSet(tagSet.toString());
+		//System.out.println(t);
 
-		System.out.println(tagSet);
-		TagSet tagSet1 = new TagSet(tagSet.toString());
-		System.out.println(tagSet1);
+		//System.out.println(tagSet);
+		//TagSet tagSet1 = new TagSet(tagSet.toString());
+		//System.out.println(tagSet1);
 
 
 		/*System.out.println("construct partition...");
@@ -43,7 +44,7 @@ public class TestCorpus {
 		Corpus evalCorpus = corpus.getEvaluationCorpus(9);
         */
 		System.out.println("start training...");
-		HMM hmm = new HMM(corpus, 2, tagSet);
+		HMM hmm = new HMM(corpus, 1, tagSet);
 		System.out.println("HMM initialized.");
 		//System.out.println(corpus.t);
 		//System.out.println("blub");
@@ -52,6 +53,9 @@ public class TestCorpus {
 		System.out.println("hmm trained after " + (hmmTrained - corpusCreated) + "ms");
 		hmm.writeModelToFile("model");
 		System.out.println("model written to file \"model\".");
+		hmm.printTransitionProbs();
+		System.out.println();
+		hmm.printEmissionProbs(4);
 		/*System.out.println("start tagging...");
 		hmm.setCorpus(evalCorpus);
 		Corpus taggedEvalCorpus = hmm.tag();

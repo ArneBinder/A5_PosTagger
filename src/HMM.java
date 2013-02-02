@@ -66,7 +66,18 @@ public class HMM {
 		System.out.println("transitionProbs(" + transitionProbs.size() + "):");
 		for (Map.Entry<Long, Double> entry : transitionProbs.entrySet()) {
 			long key = entry.getKey();
-			System.out.println(tagSet.tagGramToString(key >> TagSet.tagBoundBitCount) + "\t-->" + tagSet.tagToString((byte) (key & 0xFF)) + ": \t" + entry.getValue());
+			System.out.println(tagSet.tagGramToString(key >> TagSet.tagBoundBitCount) + "\t--> " + tagSet.tagToString((byte) (key & 0xFF)) + ": \t" + Math.exp(entry.getValue()));
+		}
+	}
+
+	public void printEmissionProbs(int featureIndex){
+		System.out.println("emissionProbs:");
+		for (byte posTag = 0; posTag < tagSet.size(); posTag++) {
+			String tagStr = tagSet.tagToString(posTag);
+			int size = emissionProbs[posTag][featureIndex].size();
+			for (Map.Entry<String, Double> entry : emissionProbs[posTag][featureIndex].entrySet()) {
+				System.out.println(tagStr+"\t	--> "+entry.getKey()+":\t"+Math.exp(entry.getValue()));
+			}
 		}
 	}
 
@@ -193,7 +204,7 @@ public class HMM {
 			//System.out.println();
 		}
 		System.out.println("emissionProbs done.");
-
+		System.out.println("normalize transitionProbs...");
 		/* transitionCounts by totalTransitions */
 		transitionProbs = new HashMap<Long, Double>();
 		for (Multiset.Entry<Long> entry : transitionCounts.entrySet()) {
