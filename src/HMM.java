@@ -63,7 +63,7 @@ public class HMM {
 	}
 
 	public void printTransitionProbs() {
-		System.out.println("transitionProbs("+transitionProbs.size()+"):");
+		System.out.println("transitionProbs(" + transitionProbs.size() + "):");
 		for (Map.Entry<Long, Double> entry : transitionProbs.entrySet()) {
 			long key = entry.getKey();
 			System.out.println(tagSet.tagGramToString(key >> TagSet.tagBoundBitCount) + "\t-->" + tagSet.tagToString((byte) (key & 0xFF)) + ": \t" + entry.getValue());
@@ -106,7 +106,7 @@ public class HMM {
 				totalTransitions.add(tagGram);
 				tagGram <<= TagSet.tagBoundBitCount;
 				currentTag = sentence.getTag(i);
-				tagGram += currentTag+1;
+				tagGram += currentTag + 1;
 				transitionCounts.add(tagGram);
 
 				//System.out.println(Helper.tagGramToString(sentence.getPrevTagsCoded(i,3)));
@@ -179,7 +179,8 @@ public class HMM {
 					//int featureIndex = featureIndex;
 					//if (logProb != 1d / 0)
 					//	System.out.println("no INf " + logProb);
-					emissionProbs[tagIndex][featureIndex].put(entry.getElement(), logProb);
+					if (logProb > Helper.smoothing)
+						emissionProbs[tagIndex][featureIndex].put(entry.getElement(), logProb);
 					//if(emissionCounts[featureIndex].remove(entry.getElement(), entryCount)>0)
 					//	System.out.println("removed");
 					// --> array aus posTagGram, featureIndex, featureValue, logProb
@@ -200,9 +201,9 @@ public class HMM {
 			Long posGram = (entry.getElement() >> TagSet.tagBoundBitCount);
 
 			double logProb = Math.log(entry.getCount()) - Math.log(totalTransitions.count(posGram));
-
-			// --> array aus fromPosTagGram, toPosTagGram, logProb
-			transitionProbs.put(entry.getElement(), logProb);
+			if (logProb > Helper.smoothing)
+				// --> array aus fromPosTagGram, toPosTagGram, logProb
+				transitionProbs.put(entry.getElement(), logProb);
 
 		}
 		System.out.println("transitionProbs done.");
@@ -243,7 +244,7 @@ public class HMM {
 		byte[][] sourceTags = new byte[sentence.length()][tagSet.size()];
 		// set initial transition probabilities
 		for (byte i = 0; i < tagSet.size(); i++) {
-			pathProbs[0][i] = getTransitionProb(i+1);
+			pathProbs[0][i] = getTransitionProb(i + 1);
 			//System.out.println(pathProbs[0][i]);
 		}
 
