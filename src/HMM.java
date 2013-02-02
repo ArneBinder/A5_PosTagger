@@ -33,6 +33,7 @@ public class HMM {
 	private int gramCount;
 	private TagSet tagSet;
 
+
 	//////// Methods ///////////
 
 	HMM(Corpus corpus, int gramCount, TagSet tagSet) {
