@@ -45,7 +45,7 @@ public class HMM {
 
 	}
 
-	HMM(String fileName){
+	HMM(String fileName) {
 		readModelFromFile(fileName);
 	}
 
@@ -115,7 +115,7 @@ public class HMM {
 				for (int j = 0; j < FeatureExtractor.featureSize; j++) {
 					//TODO: check, if Pair works correct
 					//lastSize[j] = emissionCounts[j].elementSet().size();
-					emissionCounts[j][currentTag-1].add(featureVector.features[j]);
+					emissionCounts[j][currentTag - 1].add(featureVector.features[j]);
 
 
 				}
@@ -127,7 +127,7 @@ public class HMM {
 			curSenIndex++;
 			//System.out.println();
 		}
-
+		System.out.println(tagSet);
 		int countEmissionCount = 0;
 		int totalEmissionValues = 0;
 		for (int i = 0; i < FeatureExtractor.featureSize; i++) {
@@ -150,25 +150,30 @@ public class HMM {
 		}
 		System.out.println("normalize emissionProbs...");
 		System.out.println();
-		for (byte i = 0; i < FeatureExtractor.featureSize; i++) {
-			for (int j = 0; j < tagSet.size(); j++) {
+		for (byte featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
+			for (int tagIndex = 0; tagIndex < tagSet.size(); tagIndex++) {
 
 
-				//emissionCounts[i].entrySet().iterator()
-				for (Multiset.Entry<String> entry : emissionCounts[i][j].entrySet()) {
+				//emissionCounts[featureIndex].entrySet().iterator()
+				for (Multiset.Entry<String> entry : emissionCounts[featureIndex][tagIndex].entrySet()) {
 					int entryCount = entry.getCount();
+					int totalCount = totalEmissions.count(tagIndex + 1);
 					//byte posTag = entry.getElement().getKey();
-					double logProb = Math.log(entryCount) - Math.log(totalEmissions.count(j+1));
-					//int featureIndex = i;
-					emissionProbs[j][i].put(entry.getElement(), logProb);
-					//if(emissionCounts[i].remove(entry.getElement(), entryCount)>0)
+					double logProb = Math.log(entryCount) - Math.log(totalCount);
+					if (totalEmissions.count(tagIndex + 1) != 0)
+						System.out.println(entryCount + "\t" + totalEmissions.count(tagIndex + 1));
+					//int featureIndex = featureIndex;
+					//if (logProb != 1d / 0)
+					//	System.out.println("no INf " + logProb);
+					emissionProbs[tagIndex][featureIndex].put(entry.getElement(), logProb);
+					//if(emissionCounts[featureIndex].remove(entry.getElement(), entryCount)>0)
 					//	System.out.println("removed");
 					// --> array aus posTagGram, featureIndex, featureValue, logProb
 
 				}
 
-				emissionCounts[i][j] = HashMultiset.create();
-				//System.out.println(emissionCounts[i][j].size());
+				emissionCounts[featureIndex][tagIndex] = HashMultiset.create();
+				//System.out.println(emissionCounts[featureIndex][tagIndex].size());
 			}
 			//System.out.println();
 		}
@@ -179,7 +184,9 @@ public class HMM {
 		for (Multiset.Entry<Long> entry : transitionCounts.entrySet()) {
 			// reconstruct source posGram
 			Long posGram = (entry.getElement() >> TagSet.tagBoundBitCount);
+
 			double logProb = Math.log(entry.getCount()) - Math.log(totalTransitions.count(posGram));
+
 			// --> array aus fromPosTagGram, toPosTagGram, logProb
 			transitionProbs.put(entry.getElement(), logProb);
 
@@ -298,8 +305,9 @@ public class HMM {
 
 		}
 
-		for (int i = 0; i < sentence.length(); i++) {
-			for (int j = 0; j < tagSet.size(); j++) {
+
+		for (int j = 0; j < tagSet.size(); j++) {
+			for (int i = 0; i < sentence.length(); i++) {
 				System.out.print(tagSet.tagToString((byte) (sourceTags[i][j] + 1)) + "\t");
 			}
 			System.out.println();
@@ -435,7 +443,7 @@ public class HMM {
 				for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
 					//ein Eintrag! vorher anzahl speichern
 					outputStream.writeInt((emissionProbs[posTagIndex][featureIndex].size()));
-					System.out.println(posTagIndex+"\t"+featureIndex+"\t"+emissionProbs[posTagIndex][featureIndex].size());
+					//System.out.println(posTagIndex + "\t" + featureIndex + "\t" + emissionProbs[posTagIndex][featureIndex].size());
 					for (Map.Entry<String, Double> entry : emissionProbs[posTagIndex][featureIndex].entrySet()) {
 						char[] featureValue = entry.getKey().toCharArray();
 						outputStream.writeInt(featureValue.length);
@@ -443,6 +451,8 @@ public class HMM {
 							outputStream.writeChar(c);
 						}
 						outputStream.writeDouble(entry.getValue());
+						if (!entry.getValue().isInfinite())
+							System.out.println(posTagIndex + "\t" + featureIndex + "\t" + entry.getKey() + "\t" + entry.getValue());
 					}
 				}
 			}
