@@ -15,15 +15,12 @@ public class TestCorpus {
 		long startTime = System.currentTimeMillis();
 		TagSet tagSet = new TagSet("");
 		Corpus corpus = new Corpus(tagSet);
-		int i = 0;
+
 		for (String fileName : Helper.getFileList("brown_learn")) {
 			//System.out.println(brown_learn);
 			corpus.addContentFromFile("brown_learn\\" + fileName);
-			if(corpus.size() > 30000)
+			if(corpus.size() > 40000)
 				break;
-			//if(i>100)
-			//	break;
-			i++;
 		}
 
 		long corpusCreated = System.currentTimeMillis();
@@ -55,7 +52,7 @@ public class TestCorpus {
 		System.out.println("hmm trained after " + (hmmTrained - corpusCreated) + "ms");
 		hmm.writeModelToFile("model");
 		System.out.println("model written to file \"model\".");
-		System.out.println("start tagging...");
+		/*System.out.println("start tagging...");
 		hmm.setCorpus(evalCorpus);
 		Corpus taggedEvalCorpus = hmm.tag();
 		long hmmTagged = System.currentTimeMillis();
@@ -63,7 +60,7 @@ public class TestCorpus {
 		Evaluator evaluator = new Evaluator();
 		System.out.println("F-Measure: " + evaluator.getFMeasure(corpus.getEvaluationCorpus(9), taggedEvalCorpus));
 		//System.out.println("".split("/").length);
-
+        */
 
 	}
 }

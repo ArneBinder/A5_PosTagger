@@ -16,7 +16,7 @@ public class TagSet {
 	 */
 	private BidiMap<String, Byte> tagMap = new BidiMap<String, Byte>();
 
-	public int size(){
+	public int size() {
 		return tagMap.size();
 	}
 
@@ -47,8 +47,8 @@ public class TagSet {
 		} catch (java.lang.NullPointerException e) {
 			assert tagMap.size() < tagBound : "unable to set up new tag, tagBound=" + tagBound + " reached.";
 			tagMap.put(tag, (byte) tagMap.size());
-			if(tagMap.get(tag) < 0)
-				System.out.println("BLÖÖÖÖDE "+tagMap.size());
+			if (tagMap.get(tag) < 0)
+				System.out.println("BLÖÖÖÖDE " + tagMap.size());
 			return tagMap.get(tag);
 		}
 
@@ -61,7 +61,10 @@ public class TagSet {
 	public String tagGramToString(long tagGram) {
 		String result = "";
 		while (tagGram != 0) {
-			result = tagToString((byte) (tagGram & 0xFF)) + Helper.tagDelimiter + result;
+			if(tagToString((byte) ((tagGram & 0xFF) - 1))==null){
+				System.out.println("XXXXXXXXXXXXXXXXXXXXX "+((tagGram & 0xFF)-1)+"\t"+tagGram);
+			}
+			result = tagToString((byte) ((tagGram & 0xFF) - 1)) + Helper.tagDelimiter + result;
 			tagGram >>= tagBoundBitCount;
 		}
 

@@ -37,16 +37,18 @@ public class POSTagging {
 		}else if(args[0].equals("annotate")){
 			System.out.println("read model from file \""+modelName+"\"...");
 			HMM hmm = new HMM(modelName);
+			System.out.println(hmm.getTagSet());
 			for (String fileName : Helper.getFileList(directory_name)) {
 				Corpus corpus = new Corpus(hmm.getTagSet());
 				System.out.println("read sentences from file \""+directory_name+"\\"+fileName+"\"...");
-				corpus.addContentFromFile(directory_name+"\\"+fileName);
+				corpus.addContentFromFile(directory_name + "\\" + fileName);
 				hmm.setCorpus(corpus);
 				System.out.println("tag sentences...");
-				hmm.tag().writeContentToFile(fileName+".pos");
-				System.out.println("output written to \""+fileName+".pos");
+				hmm.tag().writeContentToFile(directory_name + "\\" + fileName+".pos");
+				System.out.println("output written to \""+directory_name + "\\" + fileName+".pos");
 			}
 			System.out.println("done.");
-		}
+		} else
+			System.out.println("wrong arguments. [learn|annotate] <directory_name>");
 	}
 }

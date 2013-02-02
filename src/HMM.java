@@ -250,6 +250,8 @@ public class HMM {
 				double maxProb = -Double.MAX_VALUE;
 				//System.out.println(maxProb);
 				tagGramCoded++;
+				String tagGramStr = tagSet.tagGramToString(tagGramCoded>>TagSet.tagBoundBitCount);
+				String lastTag = "";
 				// for all possible tagGrams (sources) do...
 				for (byte prevTagIndex7 = 0; prevTagIndex7 < tagSet.size(); prevTagIndex7++) {
 					for (byte prevTagIndex6 = 0; prevTagIndex6 < tagSet.size(); prevTagIndex6++) {
@@ -258,11 +260,10 @@ public class HMM {
 								for (byte prevTagIndex3 = 0; prevTagIndex3 < tagSet.size(); prevTagIndex3++) {
 									for (byte prevTagIndex2 = 0; prevTagIndex2 < tagSet.size(); prevTagIndex2++) {
 										for (byte prevTagIndex1 = 0; prevTagIndex1 < tagSet.size(); prevTagIndex1++) {
-
+											lastTag = tagSet.tagToString(prevTagIndex1);
 											//for all current possible tags (target) do...
 											//System.out.println(getTransitionProb(tagGramCoded));
 											double currentProb = pathProbs[currentWordIndex][currentTagIndex] + getTransitionProb(tagGramCoded);
-
 											if (currentProb > maxProb) {
 												//System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentProb+" max: "+maxProb);
 												maxProb = currentProb;
@@ -270,6 +271,7 @@ public class HMM {
 												sourceTags[currentWordIndex][currentTagIndex] = prevTagIndex1;
 											}
 											tagGramCoded += 0x100L;
+											tagGramStr = tagSet.tagGramToString(tagGramCoded>>TagSet.tagBoundBitCount);
 										}
 
 										if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 2)
