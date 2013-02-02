@@ -26,16 +26,16 @@ public class TagSet {
 	public TagSet(String tagString) {
 		if (tagString.length() > 0) {
 			String[] tags = tagString.split(Helper.tagDelimiter + "");
-			assert tags.length < tagBound : "unable to set up tags, size of tag list=" + (tags.length - 1) + " exceeds tagBound=" + tagBound + ".";
-			for (byte i = 1; i < tags.length + 1; i++) {
-				tagMap.put(tags[i - 1], i);
+			assert tags.length < tagBound : "unable to set up tags, size of tag list=" + tags.length + " exceeds tagBound=" + tagBound + ".";
+			for (byte i = 0; i < tags.length; i++) {
+				tagMap.put(tags[i], i);
 			}
 		}
 	}
 
 	public String toString() {
 		String result = "";
-		for (byte i = 1; i < tagMap.size() + 1; i++) {
+		for (byte i = 0; i < tagMap.size(); i++) {
 			result += tagMap.getKey(i) + Helper.tagDelimiter;
 		}
 		return result;
@@ -45,8 +45,8 @@ public class TagSet {
 		try {
 			return tagMap.get(tag);
 		} catch (java.lang.NullPointerException e) {
-			assert tagMap.size() + 1 < tagBound : "unable to set up new tag, tagBound=" + tagBound + " reached.";
-			tagMap.put(tag, (byte) (tagMap.size() + 1));
+			assert tagMap.size() < tagBound : "unable to set up new tag, tagBound=" + tagBound + " reached.";
+			tagMap.put(tag, (byte) tagMap.size());
 			if(tagMap.get(tag) < 0)
 				System.out.println("BLÖÖÖÖDE "+tagMap.size());
 			return tagMap.get(tag);

@@ -19,7 +19,7 @@ public class TestCorpus {
 		for (String fileName : Helper.getFileList("brown_learn")) {
 			//System.out.println(brown_learn);
 			corpus.addContentFromFile("brown_learn\\" + fileName);
-			if(corpus.size() > 40000)
+			if(corpus.size() > 30000)
 				break;
 			//if(i>100)
 			//	break;
@@ -31,7 +31,9 @@ public class TestCorpus {
 		System.out.println("total size: " + corpus.size() + " sentences.");
 		//corpus.writeContentToFile("outTest");
 		System.out.println("tagSet.size(): "+tagSet.size());
-
+		System.out.println(tagSet);
+		TagSet t = new TagSet(tagSet.toString());
+		System.out.println(t);
 
 		System.out.println(tagSet);
 		TagSet tagSet1 = new TagSet(tagSet.toString());

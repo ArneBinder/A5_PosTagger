@@ -97,7 +97,7 @@ public class HMM {
 				totalTransitions.add(tagGram);
 				tagGram <<= TagSet.tagBoundBitCount;
 				currentTag = sentence.getTag(i);
-				tagGram += currentTag;
+				tagGram += currentTag+1;
 				transitionCounts.add(tagGram);
 
 				//System.out.println(Helper.tagGramToString(sentence.getPrevTagsCoded(i,3)));
@@ -115,7 +115,7 @@ public class HMM {
 				for (int j = 0; j < FeatureExtractor.featureSize; j++) {
 					//TODO: check, if Pair works correct
 					//lastSize[j] = emissionCounts[j].elementSet().size();
-					emissionCounts[j][currentTag - 1].add(featureVector.features[j]);
+					emissionCounts[j][currentTag].add(featureVector.features[j]);
 
 
 				}
@@ -128,6 +128,11 @@ public class HMM {
 			//System.out.println();
 		}
 		System.out.println(tagSet);
+
+		//for (Multiset.Entry<Byte> entry : totalEmissions.entrySet()) {
+		//	System.out.println(tagSet.tagToString(entry.getElement())+"\t"+entry.getCount()+"\t"+totalEmissions.count(entry.getElement()));
+		//}
+
 		int countEmissionCount = 0;
 		int totalEmissionValues = 0;
 		for (int i = 0; i < FeatureExtractor.featureSize; i++) {
@@ -151,17 +156,17 @@ public class HMM {
 		System.out.println("normalize emissionProbs...");
 		System.out.println();
 		for (byte featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
-			for (int tagIndex = 0; tagIndex < tagSet.size(); tagIndex++) {
+			for (byte tagIndex = 0; tagIndex < tagSet.size(); tagIndex++) {
 
 
 				//emissionCounts[featureIndex].entrySet().iterator()
 				for (Multiset.Entry<String> entry : emissionCounts[featureIndex][tagIndex].entrySet()) {
 					int entryCount = entry.getCount();
-					int totalCount = totalEmissions.count(tagIndex + 1);
+					int totalCount = totalEmissions.count(tagIndex);
 					//byte posTag = entry.getElement().getKey();
 					double logProb = Math.log(entryCount) - Math.log(totalCount);
-					if (totalEmissions.count(tagIndex + 1) != 0)
-						System.out.println(entryCount + "\t" + totalEmissions.count(tagIndex + 1));
+					//if (totalEmissions.count(tagIndex) != 0)
+					//	System.out.println(entryCount + "\t" + totalEmissions.count(tagIndex));
 					//int featureIndex = featureIndex;
 					//if (logProb != 1d / 0)
 					//	System.out.println("no INf " + logProb);
@@ -308,7 +313,7 @@ public class HMM {
 
 		for (int j = 0; j < tagSet.size(); j++) {
 			for (int i = 0; i < sentence.length(); i++) {
-				System.out.print(tagSet.tagToString((byte) (sourceTags[i][j] + 1)) + "\t");
+				System.out.print(tagSet.tagToString(sourceTags[i][j]) + "\t");
 			}
 			System.out.println();
 		}
@@ -327,7 +332,7 @@ public class HMM {
 		byte[] resultTags = new byte[sentence.length()];
 		byte nextTagIndex = lastTagIndex;
 		for (int i = sentence.length() - 1; i >= 0; i--) {
-			resultTags[i] = (byte) (nextTagIndex + 1);
+			resultTags[i] = nextTagIndex;
 			nextTagIndex = sourceTags[i][nextTagIndex];
 		}
 
@@ -451,8 +456,8 @@ public class HMM {
 							outputStream.writeChar(c);
 						}
 						outputStream.writeDouble(entry.getValue());
-						if (!entry.getValue().isInfinite())
-							System.out.println(posTagIndex + "\t" + featureIndex + "\t" + entry.getKey() + "\t" + entry.getValue());
+						//if (!entry.getValue().isInfinite())
+						//	System.out.println(posTagIndex + "\t" + featureIndex + "\t" + entry.getKey() + "\t" + entry.getValue());
 					}
 				}
 			}

@@ -69,7 +69,7 @@ public class Sentence {
 		System.arraycopy(tags, 0, this.tags, 0, this.tags.length);
 	}
 
-	public String getPrevTags(int index, int count) {
+	/*public String getPrevTags(int index, int count) {
 		String result = "";//new String[count];
 		for (int i = index - count; i < 0; i++) {
 			result += Helper.tagDelimiter;
@@ -87,7 +87,7 @@ public class Sentence {
 			result += tags[i];
 		}
 		return result;
-	}
+	} */
 
 	public byte getTag(int index) {
 		return tags[index];
