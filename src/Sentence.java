@@ -21,7 +21,8 @@ public class Sentence {
 	public String[] getWords() {
 		return words;
 	}
-	public String getWord(int index){
+
+	public String getWord(int index) {
 		return words[index];
 	}
 
@@ -38,10 +39,13 @@ public class Sentence {
 		this.tags = new short[length];
 		String[] taggedWord;
 		for (int i = 0; i < length; i++) {
-			if (tempWords[i].contains(Helper.tagDelimiter+"")) {
-				taggedWord = tempWords[i].split(Helper.tagDelimiter+"");
+			if (tempWords[i].contains(Helper.tagDelimiter + "")) {
+				taggedWord = tempWords[i].split(Helper.tagDelimiter + "");
 				this.words[i] = taggedWord[0];
-				this.tags[i] = tagSet.tagToByte(taggedWord[1]);
+				for (int j = 1; j < taggedWord.length - 2; j++) {
+					this.words[i] += taggedWord[j];
+				}
+				this.tags[i] = tagSet.tagToByte(taggedWord[taggedWord.length - 1]);
 			} else {
 				this.words[i] = tempWords[i];
 				this.tags[i] = -1;
@@ -61,36 +65,33 @@ public class Sentence {
 		return result;
 	}
 
-	public void setTags(short[] tags){
-		System.arraycopy(tags,0,this.tags,0,this.tags.length);
+	public void setTags(short[] tags) {
+		System.arraycopy(tags, 0, this.tags, 0, this.tags.length);
 	}
 
 	public String getPrevTags(int index, int count) {
 		String result = "";//new String[count];
 		for (int i = index - count; i < 0; i++) {
-		   result += Helper.tagDelimiter;
+			result += Helper.tagDelimiter;
 		}
-		for (int i =  (index-count<0?0:index-count); i < index; i++) {
-			result += Helper.tagDelimiter+tags[i];
+		for (int i = (index - count < 0 ? 0 : index - count); i < index; i++) {
+			result += Helper.tagDelimiter + tags[i];
 		}
 		return result;
 	}
 
 	public long getPrevTagsCoded(int index, int count) {
 		long result = 0;
-		for (int i = (index-count<0?0:index-count); i < index; i++) {
+		for (int i = (index - count < 0 ? 0 : index - count); i < index; i++) {
 			result <<= TagSet.tagBoundBitCount;
 			result += tags[i];
 		}
 		return result;
 	}
 
-	public short getTag(int index){
+	public short getTag(int index) {
 		return tags[index];
 	}
-
-
-
 
 
 }
