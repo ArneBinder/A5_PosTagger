@@ -168,7 +168,7 @@ public class HMM {
 				}
 
 				emissionCounts[i][j] = HashMultiset.create();
-				System.out.println(emissionCounts[i][j].size());
+				//System.out.println(emissionCounts[i][j].size());
 			}
 			//System.out.println();
 		}
@@ -379,15 +379,15 @@ public class HMM {
 			// read emissionProbs
 			emissionProbs = new HashMap[tagSetSize][FeatureExtractor.featureSize];
 			// pos-tag x feature-index x feature-value --> probability
-			for (int posTagIndex = 0; posTagIndex < tagSetSize; posTagIndex++) {
+			for (int posTagIndex = 0; posTagIndex < tagSet.size(); posTagIndex++) {
 				for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
 					int listLength = inputStream.readInt();
 					emissionProbs[posTagIndex][featureIndex] = new HashMap<String, Double>(listLength);
 					for (int i = 0; i < listLength; i++) {
-						int strLength = inputStream.readByte();
+						int strLength = inputStream.readInt();
 						char[] chars = new char[strLength];
 						for (int j = 0; j < strLength; j++) {
-							chars[i] = inputStream.readChar();
+							chars[j] = inputStream.readChar();
 						}
 						emissionProbs[posTagIndex][featureIndex].put(String.valueOf(chars), inputStream.readDouble());
 					}
@@ -435,9 +435,10 @@ public class HMM {
 				for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
 					//ein Eintrag! vorher anzahl speichern
 					outputStream.writeInt((emissionProbs[posTagIndex][featureIndex].size()));
+					System.out.println(posTagIndex+"\t"+featureIndex+"\t"+emissionProbs[posTagIndex][featureIndex].size());
 					for (Map.Entry<String, Double> entry : emissionProbs[posTagIndex][featureIndex].entrySet()) {
 						char[] featureValue = entry.getKey().toCharArray();
-						outputStream.writeByte((byte) featureValue.length);
+						outputStream.writeInt(featureValue.length);
 						for (char c : featureValue) {
 							outputStream.writeChar(c);
 						}

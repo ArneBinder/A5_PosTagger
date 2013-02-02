@@ -7,6 +7,10 @@
  */
 public class POSTagging {
 	public static void main(String[] args) {
+		if(args.length!=2){
+			System.out.println("wrong arguments. [learn|annotate] <directory_name>");
+			return;
+		}
 		final String modelName = "model";
 		String directory_name = args[1];
 		long startTime = System.currentTimeMillis();
@@ -35,8 +39,8 @@ public class POSTagging {
 			HMM hmm = new HMM(modelName);
 			for (String fileName : Helper.getFileList(directory_name)) {
 				Corpus corpus = new Corpus(hmm.getTagSet());
-				System.out.println("read sentences from file \""+fileName+"\"...");
-				corpus.addContentFromFile(fileName);
+				System.out.println("read sentences from file \""+directory_name+"\\"+fileName+"\"...");
+				corpus.addContentFromFile(directory_name+"\\"+fileName);
 				hmm.setCorpus(corpus);
 				System.out.println("tag sentences...");
 				hmm.tag().writeContentToFile(fileName+".pos");
