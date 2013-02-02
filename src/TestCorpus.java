@@ -37,13 +37,13 @@ public class TestCorpus {
 		System.out.println(tagSet1);
 
 
-		System.out.println("construct partition...");
+		/*System.out.println("construct partition...");
 		corpus.constructPartition(10);
 		Corpus trainCorpus = corpus.getTrainCorpus(9);
 		Corpus evalCorpus = corpus.getEvaluationCorpus(9);
-
+        */
 		System.out.println("start training...");
-		HMM hmm = new HMM(trainCorpus, 2, tagSet);
+		HMM hmm = new HMM(corpus, 2, tagSet);
 		System.out.println("HMM initialized.");
 		//System.out.println(corpus.t);
 		//System.out.println("blub");

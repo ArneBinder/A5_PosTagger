@@ -98,7 +98,7 @@ public class HMM {
 				totalTransitions.add(tagGram);
 				tagGram <<= TagSet.tagBoundBitCount;
 				currentTag = sentence.getTag(i);
-				tagGram += currentTag+1;
+				tagGram += currentTag;//+1;
 				transitionCounts.add(tagGram);
 
 				//System.out.println(Helper.tagGramToString(sentence.getPrevTagsCoded(i,3)));
@@ -240,7 +240,7 @@ public class HMM {
 		}
 
 		//byte[] bestTags = new byte[sentence.length()];
-		long tagGramCoded = 0x100L;
+		long tagGramCoded = 0;//0x100L;
 
 		// for all words do...
 		for (int currentWordIndex = 0; currentWordIndex < sentence.length(); currentWordIndex++) {
@@ -249,18 +249,25 @@ public class HMM {
 			for (byte currentTagIndex = 0; currentTagIndex < tagSet.size(); currentTagIndex++) {
 				double maxProb = -Double.MAX_VALUE;
 				//System.out.println(maxProb);
-				tagGramCoded++;
+
 				String tagGramStr = tagSet.tagGramToString(tagGramCoded>>TagSet.tagBoundBitCount);
 				String lastTag = "";
 				// for all possible tagGrams (sources) do...
 				for (byte prevTagIndex7 = 0; prevTagIndex7 < tagSet.size(); prevTagIndex7++) {
+					tagGramCoded &= 0xFF000000000000FFL;
 					for (byte prevTagIndex6 = 0; prevTagIndex6 < tagSet.size(); prevTagIndex6++) {
+						tagGramCoded &= 0xFFFF0000000000FFL;
 						for (byte prevTagIndex5 = 0; prevTagIndex5 < tagSet.size(); prevTagIndex5++) {
+							tagGramCoded &= 0xFFFFFF00000000FFL;
 							for (byte prevTagIndex4 = 0; prevTagIndex4 < tagSet.size(); prevTagIndex4++) {
+								tagGramCoded &= 0xFFFFFFFF000000FFL;
 								for (byte prevTagIndex3 = 0; prevTagIndex3 < tagSet.size(); prevTagIndex3++) {
+									tagGramCoded &= 0xFFFFFFFFFF0000FFL;
 									for (byte prevTagIndex2 = 0; prevTagIndex2 < tagSet.size(); prevTagIndex2++) {
+										tagGramCoded &= 0xFFFFFFFFFFFF00FFL;
 										for (byte prevTagIndex1 = 0; prevTagIndex1 < tagSet.size(); prevTagIndex1++) {
 											lastTag = tagSet.tagToString(prevTagIndex1);
+											tagGramStr = tagSet.tagGramToString(tagGramCoded>>TagSet.tagBoundBitCount);
 											//for all current possible tags (target) do...
 											//System.out.println(getTransitionProb(tagGramCoded));
 											double currentProb = pathProbs[currentWordIndex][currentTagIndex] + getTransitionProb(tagGramCoded);
@@ -277,37 +284,38 @@ public class HMM {
 										if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 2)
 											break;
 										//System.out.println("asdasd");
-										tagGramCoded &= 0xFFFFFFFFFFFF00FFL;
-										tagGramCoded += 0x10100L;
+
+										tagGramCoded += 0x10000L;
 									}
 									if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 3)
 										break;
 									//System.out.println("asdasd");
-									tagGramCoded &= 0xFFFFFFFFFF0000FFL;
-									tagGramCoded += 0x1010100L;
+
+									tagGramCoded += 0x1000000L;
 								}
 								if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 4)
 									break;
-								tagGramCoded &= 0xFFFFFFFF000000FFL;
-								tagGramCoded += 0x101010100L;
+
+								tagGramCoded += 0x100000000L;
 							}
 							if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 5)
 								break;
-							tagGramCoded &= 0xFFFFFF00000000FFL;
-							tagGramCoded += 0x10101010100L;
+
+							tagGramCoded += 0x10000000000L;
 						}
 						if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 6)
 							break;
-						tagGramCoded &= 0xFFFF0000000000FFL;
-						tagGramCoded += 0x1010101010100L;
+
+						tagGramCoded += 0x1000000000000L;
 					}
 					if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 7)
 						break;
-					tagGramCoded &= 0xFF000000000000FFL;
-					tagGramCoded += 0x101010101010100L;
+
+					tagGramCoded += 0x100000000000000L;
 				}
 				//System.out.println(maxProb);
 				pathProbs[currentWordIndex + 1][currentTagIndex] = maxProb + getEmitProb(currentTagIndex, featureVector);
+				tagGramCoded++;
 			}
 
 
