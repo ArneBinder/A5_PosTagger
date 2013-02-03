@@ -36,7 +36,7 @@ public class FeatureExtractor {
 
 	static int MAX_PREFIX_LENGTH = 0;
 	static int MAX_SUFFIX_LENGTH = 0;
-	public static int featureSize = 1;//10+3*(MAX_SUFFIX_LENGTH+MAX_PREFIX_LENGTH);
+	public static int featureSize = 10+3*(MAX_SUFFIX_LENGTH+MAX_PREFIX_LENGTH);
 
 	public FeatureVector getFeatures(Sentence sentence, int n) {
 
@@ -49,7 +49,7 @@ public class FeatureExtractor {
 		//		= new ObjectToDoubleMap<String>();
 		String token = normToken(sentence.getWord(n));
 		feats[0] = token;
-		/*
+
 		boolean bos = n == 0;
 		boolean eos = (n + 1) >= sentence.length();
 
@@ -142,7 +142,7 @@ public class FeatureExtractor {
 		}
 
 
-		*/
+
 		FeatureVector featureVector = new FeatureVector(feats);
 		return featureVector;
 	}

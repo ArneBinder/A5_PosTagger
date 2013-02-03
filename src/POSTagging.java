@@ -38,15 +38,18 @@ public class POSTagging {
 			System.out.println("read model from file \""+modelName+"\"...");
 			HMM hmm = new HMM(modelName);
 			System.out.println(hmm.getTagSet());
-			hmm.printEmissionProbs(0);
-			hmm.printTransitionProbs();
+			//hmm.printEmissionProbs(0);
+			//hmm.printTransitionProbs();
 			for (String fileName : Helper.getFileList(directory_name)) {
 				Corpus corpus = new Corpus(hmm.getTagSet());
 				System.out.println("read sentences from file \""+directory_name+"\\"+fileName+"\"...");
 				corpus.addContentFromFile(directory_name + "\\" + fileName);
 				hmm.setCorpus(corpus);
 				System.out.println("tag sentences...");
-				hmm.tag().writeContentToFile(directory_name + "\\" + fileName+".pos");
+				Corpus taggedCorpus = hmm.tag();
+				Evaluator evaluator = new Evaluator();
+				System.out.println("FMeasure: "+evaluator.getFMeasure(corpus, taggedCorpus));
+				taggedCorpus.writeContentToFile(directory_name + "\\" + fileName+".pos");
 				System.out.println("output written to \""+directory_name + "\\" + fileName+".pos");
 			}
 			System.out.println("done.");

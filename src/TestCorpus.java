@@ -13,15 +13,15 @@ import java.util.HashSet;
 public class TestCorpus {
 	public static void main(String[] args) {
 		long startTime = System.currentTimeMillis();
-		final String directoryName = "brown_learn_0.1";
+		final String directoryName = "brown_learn";
 		TagSet tagSet = new TagSet("");
 		Corpus corpus = new Corpus(tagSet);
 
 		for (String fileName : Helper.getFileList(directoryName)) {
 			//System.out.println(brown_learn);
 			corpus.addContentFromFile(directoryName+"\\" + fileName);
-			//if(corpus.size() > 0)//45000)
-			//	break;
+			if(corpus.size() > 45000)
+				break;
 		}
 
 		long corpusCreated = System.currentTimeMillis();
@@ -38,13 +38,13 @@ public class TestCorpus {
 		//System.out.println(tagSet1);
 
 
-		/*System.out.println("construct partition...");
+		System.out.println("construct partition...");
 		corpus.constructPartition(10);
 		Corpus trainCorpus = corpus.getTrainCorpus(9);
 		Corpus evalCorpus = corpus.getEvaluationCorpus(9);
-        */
+
 		System.out.println("start training...");
-		HMM hmm = new HMM(corpus, 1, tagSet);
+		HMM hmm = new HMM(trainCorpus, 1, tagSet);
 		System.out.println("HMM initialized.");
 		//System.out.println(corpus.t);
 		//System.out.println("blub");
@@ -55,6 +55,16 @@ public class TestCorpus {
 		System.out.println("model written to file \"model\".");
 		hmm.printTransitionProbs();
 		System.out.println();
+        /*
+		HMM hmm = new HMM("model");
+		evalCorpus.writeContentToFile("evalCorpus");
+		hmm.setCorpus(evalCorpus);
+		Corpus taggedCorpus = hmm.tag();
+		taggedCorpus.writeContentToFile("taggedCorpus");
+		Evaluator evaluator = new Evaluator();
+		System.out.println("FMeasure: "+evaluator.getSimpleFMeasure(evalCorpus, taggedCorpus));
+*/
+
 		//hmm.printEmissionProbs(4);
 		/*System.out.println("start tagging...");
 		hmm.setCorpus(evalCorpus);

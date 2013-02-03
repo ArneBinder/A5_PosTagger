@@ -251,6 +251,8 @@ public class HMM {
 			Sentence taggedSentence = tagSentence(corpus.getSentence(i));
 			taggedCorpus.addSentence(taggedSentence);
 			System.out.println(taggedSentence);
+			if(i>100)
+				break;
 		}
 		return taggedCorpus;
 	}
@@ -385,7 +387,7 @@ public class HMM {
 			}
 		}
 
-		for (byte j = 0; j < tagSet.size(); j++) {
+		/*for (byte j = 0; j < tagSet.size(); j++) {
 			for (int i = 0; i < sentence.length(); i++) {
 				System.out.print(tagSet.tagToString(sourceTags[i][j]) + "\t");
 			}
@@ -394,7 +396,7 @@ public class HMM {
 			if(j==lastTagIndex)
 				System.out.print("\t<------------");
 			System.out.println();
-		}
+		} */
 
 		byte[] resultTags = new byte[sentence.length()];
 		byte nextTagIndex = lastTagIndex;

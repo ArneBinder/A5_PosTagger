@@ -37,6 +37,24 @@ public class Evaluator {
 		return (double) t / (double) (t + f);
 	}
 
+	public double getSimpleFMeasure(Corpus correctCorpus, Corpus testCorpus) {
+		//fp = 0;
+		//fn = 0;
+		//tp = 0;
+		f = 0;
+		t = 0;
+		//tn = 0;
+		//assert correctCorpus.size() == testCorpus.size() : "Corpus size does not match.";
+		for (int i = 0; i < testCorpus.size(); i++) {
+			checkSentences(correctCorpus.getSentence(i), testCorpus.getSentence(i));
+		}
+		//double precision = ((double) tp) / (double) (tp + fp);
+		//double recall = ((double) tp) / (double) (tp + fn);
+		//return 2 * precision * recall / (precision + recall);
+		//return (double) tp / (double) (tp + fn + fp);
+		return ((double) t) / ((double) (t + f));
+	}
+
 	private void checkSentences(Sentence correctSentence, Sentence testSentence) {
 		assert correctSentence.length() == testSentence.length() : "Sentence length does not match.";
 
