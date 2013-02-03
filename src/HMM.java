@@ -373,7 +373,7 @@ public class HMM {
 
 
 
-		double resultProb = 0;
+		double resultProb = -Double.MAX_VALUE;
 		double currentProb;
 		byte lastTagIndex = 0;
 		for (byte i = 0; i < tagSet.size(); i++) {
@@ -385,12 +385,14 @@ public class HMM {
 			}
 		}
 
-		for (int j = 0; j < tagSet.size(); j++) {
+		for (byte j = 0; j < tagSet.size(); j++) {
 			for (int i = 0; i < sentence.length(); i++) {
 				System.out.print(tagSet.tagToString(sourceTags[i][j]) + "\t");
 			}
+
+			System.out.print(pathProbs[sentence.length()][j]);
 			if(j==lastTagIndex)
-				System.out.print(resultProb);
+				System.out.print("\t<------------");
 			System.out.println();
 		}
 
