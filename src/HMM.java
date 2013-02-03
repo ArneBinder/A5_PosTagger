@@ -251,8 +251,8 @@ public class HMM {
 			Sentence taggedSentence = tagSentence(corpus.getSentence(i));
 			taggedCorpus.addSentence(taggedSentence);
 			System.out.println(taggedSentence);
-			if(i>100)
-				break;
+			//if(i>100)
+			//	break;
 		}
 		return taggedCorpus;
 	}
