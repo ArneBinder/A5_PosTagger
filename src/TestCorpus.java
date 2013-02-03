@@ -13,7 +13,7 @@ import java.util.HashSet;
 public class TestCorpus {
 	public static void main(String[] args) {
 		long startTime = System.currentTimeMillis();
-		final String directoryName = "brown_learn_1";
+		final String directoryName = "brown_learn_0.1";
 		TagSet tagSet = new TagSet("");
 		Corpus corpus = new Corpus(tagSet);
 
@@ -55,7 +55,7 @@ public class TestCorpus {
 		System.out.println("model written to file \"model\".");
 		hmm.printTransitionProbs();
 		System.out.println();
-		hmm.printEmissionProbs(4);
+		//hmm.printEmissionProbs(4);
 		/*System.out.println("start tagging...");
 		hmm.setCorpus(evalCorpus);
 		Corpus taggedEvalCorpus = hmm.tag();

@@ -38,6 +38,7 @@ public class POSTagging {
 			System.out.println("read model from file \""+modelName+"\"...");
 			HMM hmm = new HMM(modelName);
 			System.out.println(hmm.getTagSet());
+			hmm.printEmissionProbs(0);
 			hmm.printTransitionProbs();
 			for (String fileName : Helper.getFileList(directory_name)) {
 				Corpus corpus = new Corpus(hmm.getTagSet());

@@ -36,7 +36,7 @@ public class FeatureExtractor {
 
 	static int MAX_PREFIX_LENGTH = 0;
 	static int MAX_SUFFIX_LENGTH = 0;
-	public static int featureSize = 10+3*(MAX_SUFFIX_LENGTH+MAX_PREFIX_LENGTH);
+	public static int featureSize = 1;//10+3*(MAX_SUFFIX_LENGTH+MAX_PREFIX_LENGTH);
 
 	public FeatureVector getFeatures(Sentence sentence, int n) {
 
@@ -47,7 +47,9 @@ public class FeatureExtractor {
 
 		//ObjectToDoubleMap<String> feats
 		//		= new ObjectToDoubleMap<String>();
-
+		String token = normToken(sentence.getWord(n));
+		feats[0] = token;
+		/*
 		boolean bos = n == 0;
 		boolean eos = (n + 1) >= sentence.length();
 
@@ -55,7 +57,7 @@ public class FeatureExtractor {
 		String prevTokenCat = bos ? null : categorize(sentence.getWord(n-1));
 		String nextTokenCat = eos ? null : categorize(sentence.getWord(n+1));
 
-		String token = normToken(sentence.getWord(n));
+
 		String prevToken = bos ? null : normToken(sentence.getWord(n - 1));
 		String nextToken = eos ? null : normToken(sentence.getWord(n + 1));
 
@@ -63,20 +65,22 @@ public class FeatureExtractor {
 		//String prevPosTag = bos ? null : mPosTagging.tag(n - 1);
 		//String nextPosTag = eos ? null : mPosTagging.tag(n + 1);
 
+
+
 		if (bos)
 			//feats.set("BOS", 1.0);
-			feats[0] = "1";
+			feats[1] = "1";
 		//else feats[0] = "0";
 		if (eos)
 			//feats.set("EOS", 1.0);
-			feats[1] = "1";
+			feats[2] = "1";
 		//else feats[1] = "0";
 		if (!bos && !eos)
 			//feats.set("!BOS!EOS", 1.0);
-			feats[2] = "1";
+			feats[3] = "1";
 		//else feats[2] = "0";
 		//feats.set("TOK_" + token, 1.0);
-		feats[4] = token;
+
 		if (!bos)
 			//feats.set("TOK_PREV_" + prevToken, 1.0);
 			feats[5] = prevToken;
@@ -96,12 +100,6 @@ public class FeatureExtractor {
 			feats[9] = nextTokenCat;
 		//else feats[9] = "";
 
-		/*feats.set("POS_" + posTag, 1.0);
-		if (!bos)
-			feats.set("POS_PREV_" + prevPosTag, 1.0);
-		if (!eos)
-			feats.set("POS_NEXT_" + nextPosTag, 1.0);
-        */
 		//List<String> suffix = suffixes(token);
 		int startIndex = 10;
 		int index = startIndex;
@@ -143,17 +141,8 @@ public class FeatureExtractor {
 			index = startIndex;
 		}
 
-		//if(dict.getDictEntries("Short").contains(token))
-		//	feats.set("DICT_SHORT", 1.0);
-		//if(dict.getDictEntries("Full").contains(token))
-		//	feats.set("DICT_FULL", 1.0);
-		//if(dict.getDictEntries("Stop").contains(token))
-		//	feats.set("STOPWORD", 1.0);
-		/*for (String feat : feats) {
-			System.out.print(feat + ", ");
-		}
-		System.out.println();
-        */
+
+		*/
 		FeatureVector featureVector = new FeatureVector(feats);
 		return featureVector;
 	}

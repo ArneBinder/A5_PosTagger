@@ -61,9 +61,9 @@ public class TagSet {
 	public String tagGramToString(long tagGram) {
 		String result = "";
 		while (tagGram != 0) {
-			/*if(tagToString((byte) ((tagGram & 0xFF)))==null){
+			if(tagToString((byte) ((tagGram & 0xFF)))==null){
 				System.out.println("XXXXXXXXXXXXXXXXXXXXX "+((tagGram & 0xFF)-1)+"\t"+tagGram);
-			} */
+			}
 			result = tagToString((byte) ((tagGram & 0xFF)-1)) + Helper.tagDelimiter + result;
 			tagGram >>= tagBoundBitCount;
 		}
