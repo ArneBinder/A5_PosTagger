@@ -95,8 +95,8 @@ public class Evaluator {
 		double fSum = 0;
 		List<Double> fMeasures = new ArrayList<Double>();
 		for (int j = 0; j < partitionCount; j++) {
-			Corpus trainCorpus = corpus.getTrainCorpus(i);
-			Corpus evalCorpus = corpus.getEvaluationCorpus(i);
+			Corpus trainCorpus = corpus.getTrainCorpus(j);
+			Corpus evalCorpus = corpus.getEvaluationCorpus(j);
 
 			HMM hmm = new HMM(trainCorpus, 1, tagSet);
 			System.out.println("HMM initialized.");
@@ -107,7 +107,7 @@ public class Evaluator {
 			long hmmTagged = System.currentTimeMillis();
 			System.out.println("tagging done. " + (hmmTagged - startTagging) + "ms");
 			Evaluator evaluator = new Evaluator();
-			double fMeasure = evaluator.getFMeasure(corpus.getEvaluationCorpus(i), taggedEvalCorpus);
+			double fMeasure = evaluator.getFMeasure(corpus.getEvaluationCorpus(j), taggedEvalCorpus);
 			fSum += fMeasure;
 			System.out.println("F-Measure: " + fMeasure);
 		}

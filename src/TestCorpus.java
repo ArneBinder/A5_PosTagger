@@ -63,7 +63,7 @@ public class TestCorpus {
 		taggedCorpus.writeContentToFile("taggedCorpus");
 		Evaluator evaluator = new Evaluator();
 		System.out.println("FMeasure: "+evaluator.getSimpleFMeasure(evalCorpus, taggedCorpus));
-*/
+		*/
 
 		//hmm.printEmissionProbs(4);
 		/*System.out.println("start tagging...");
