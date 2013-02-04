@@ -11,9 +11,9 @@ public class TestEval {
 		String directory = "brown_learn_my";
 		FeatureExtractor featureExtractor = new FeatureExtractor();
 		Corpus evalCorpus = new Corpus(tagSet);
-		evalCorpus.addContentFromFile(directory+"\\eval.pos", featureExtractor);
+		evalCorpus.addContentFromFile(directory+"\\evalCorpus", featureExtractor);
 		Corpus taggedCorpus = new Corpus(tagSet);
-		taggedCorpus.addContentFromFile(directory+"\\eval_output.pos", featureExtractor);
+		taggedCorpus.addContentFromFile(directory+"\\taggedCorpus", featureExtractor);
 
 		System.out.println(evalCorpus.getTagSet());
 		System.out.println(taggedCorpus.getTagSet());
