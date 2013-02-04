@@ -252,7 +252,7 @@ public class HMM {
 			Sentence taggedSentence = tagSentence(corpus.getSentence(i));
 			taggedCorpus.addSentence(taggedSentence);
 			System.out.println(taggedSentence);
-			//if(i>100)
+			//if(i>20)
 			//	break;
 		}
 		return taggedCorpus;

@@ -52,7 +52,10 @@ public class Corpus {
 		return content.size();
 	}
 
-	/*public FeatureExtractor getFeatureExtractor() {
+	public TagSet getTagSet() {
+		return tagSet;
+	}
+/*public FeatureExtractor getFeatureExtractor() {
 		return featureExtractor;
 	}
 

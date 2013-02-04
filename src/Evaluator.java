@@ -18,6 +18,8 @@ public class Evaluator {
 	int t;
 	//int tn;
 
+
+
 	// TODO: check this!
 	public double getFMeasure(Corpus correctCorpus, Corpus testCorpus) {
 		//fp = 0;
@@ -28,7 +30,7 @@ public class Evaluator {
 		//tn = 0;
 		assert correctCorpus.size() == testCorpus.size() : "Corpus size does not match.";
 		for (int i = 0; i < correctCorpus.size(); i++) {
-			checkSentences(correctCorpus.getSentence(i), testCorpus.getSentence(i));
+			checkSentences(correctCorpus.getSentence(i), testCorpus.getSentence(i), i, correctCorpus, testCorpus);
 		}
 		//double precision = ((double) tp) / (double) (tp + fp);
 		//double recall = ((double) tp) / (double) (tp + fn);
@@ -46,7 +48,7 @@ public class Evaluator {
 		//tn = 0;
 		//assert correctCorpus.size() == testCorpus.size() : "Corpus size does not match.";
 		for (int i = 0; i < testCorpus.size(); i++) {
-			checkSentences(correctCorpus.getSentence(i), testCorpus.getSentence(i));
+			checkSentences(correctCorpus.getSentence(i), testCorpus.getSentence(i), i, correctCorpus, testCorpus);
 		}
 		//double precision = ((double) tp) / (double) (tp + fp);
 		//double recall = ((double) tp) / (double) (tp + fn);
@@ -55,7 +57,7 @@ public class Evaluator {
 		return ((double) t) / ((double) (t + f));
 	}
 
-	private void checkSentences(Sentence correctSentence, Sentence testSentence) {
+	private void checkSentences(Sentence correctSentence, Sentence testSentence, int sentencID, Corpus correctCorpus, Corpus testCorpus) {
 		assert correctSentence.length() == testSentence.length() : "Sentence length does not match.";
 
 		for (int i = 0; i < correctSentence.length(); i++) {
@@ -63,7 +65,11 @@ public class Evaluator {
 				t++;
 			else {
 				f++;
-			}
+				//System.out.println(sentencID +",\t"+i+": \t"+ correctCorpus.getTagSet().tagToString(correctSentence.getTag(i))+"\t"+correctCorpus.getTagSet().tagToString(testSentence.getTag(i)));
+				//System.out.println(correctSentence);
+				//System.out.println(testSentence);
+
+				}
 		}
 
 	}

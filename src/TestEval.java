@@ -8,12 +8,15 @@
 public class TestEval {
 	public static void main(String[] args) {
 		TagSet tagSet = new TagSet("");
+		String directory = "brown_learn_my";
 		FeatureExtractor featureExtractor = new FeatureExtractor();
 		Corpus evalCorpus = new Corpus(tagSet);
-		evalCorpus.addContentFromFile("evalCorpus", featureExtractor);
+		evalCorpus.addContentFromFile(directory+"\\eval.pos", featureExtractor);
 		Corpus taggedCorpus = new Corpus(tagSet);
-		taggedCorpus.addContentFromFile("taggedCorpus", featureExtractor);
+		taggedCorpus.addContentFromFile(directory+"\\eval_output.pos", featureExtractor);
 
+		System.out.println(evalCorpus.getTagSet());
+		System.out.println(taggedCorpus.getTagSet());
 		System.out.println(evalCorpus.size());
 		System.out.println(taggedCorpus.size());
 		Evaluator evaluator = new Evaluator();

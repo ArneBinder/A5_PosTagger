@@ -12,7 +12,7 @@ public class POSTagging {
 			return;
 		}
 		final String modelName = "model";
-		final String featureValuesFile = "features";
+		final String featureValuesFile = "featureValues";
 		String directory_name = args[1];
 		long startTime = System.currentTimeMillis();
 

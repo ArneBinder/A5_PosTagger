@@ -34,7 +34,7 @@ public class FeatureExtractor {
 
 	static int MAX_PREFIX_LENGTH = 0;
 	static int MAX_SUFFIX_LENGTH = 0;
-	public static int featureSize = 10 + 3 * (MAX_SUFFIX_LENGTH + MAX_PREFIX_LENGTH);
+	public static int featureSize = 1;//10 + 3 * (MAX_SUFFIX_LENGTH + MAX_PREFIX_LENGTH);
 	//private static int[] intialCapacities = {40000,2,2,2,2,40000,40000,20,20,20};
 
 	private HashMap<String, Integer> featureValues = new HashMap<String, Integer>(40000);
@@ -78,7 +78,7 @@ public class FeatureExtractor {
 		//		= new ObjectToDoubleMap<String>();
 		String token = normToken(sentence.getWord(n));
 		feats[0] = getFeatureValue(token);
-
+		/*
 		boolean bos = n == 0;
 		boolean eos = (n + 1) >= sentence.length();
 
@@ -179,7 +179,7 @@ public class FeatureExtractor {
 			startIndex += MAX_PREFIX_LENGTH + MAX_SUFFIX_LENGTH;
 			index = startIndex;
 		}
-
+        */
 
 		FeatureVector featureVector = new FeatureVector(feats);
 		return featureVector;
@@ -311,7 +311,7 @@ public class FeatureExtractor {
 		}
 	}
 
-	void resetFeatureValues() {
+	public void resetFeatureValues() {
 		//for (int featureIndex = 0; featureIndex < featureSize; featureIndex++) {
 			this.featureValues.clear();//new BidiMap<String, Integer>();
 		//}

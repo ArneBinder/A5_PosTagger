@@ -28,7 +28,7 @@ public class TestCorpus {
 			corpus.addContentFromFile(directoryName + "\\" + fileName, featureExtractor);
 			if (corpus.size() > 45000)
 				break;
-			if (i > 200)
+			if (i > 300)
 			 	break;
 			i++;
 		}
@@ -38,8 +38,10 @@ public class TestCorpus {
 		//	System.out.println(featureExtractor.getFeatureValues(j).size());
 		//}
 		System.out.println("write featureValues to file...");
-		featureExtractor.writeFeatureValuesToFile("featureValues", false);
+		featureExtractor.writeFeatureValuesToFile("featureValues", true);
+		//featureExtractor.resetFeatureValues();
 		System.out.println("done.");
+		long corpusCreated = System.currentTimeMillis();
 
 		/*
 		FeatureExtractor f2 = new FeatureExtractor("featureValues");
@@ -54,7 +56,7 @@ public class TestCorpus {
 		//}
         */
 
-		/*long corpusCreated = System.currentTimeMillis();
+		/*
 		System.out.println("corpus created after " + (corpusCreated - startTime) + "ms");
 		System.out.println("total size: " + corpus.size() + " sentences.");
 		//corpus.writeContentToFile("outTest");
@@ -80,12 +82,12 @@ public class TestCorpus {
 		//System.out.println(tagSet1);
 
 
-		/*System.out.println("construct partition...");
+		System.out.println("construct partition...");
 		corpus.constructPartition(10);
 		Corpus trainCorpus = corpus.getTrainCorpus(9);
 		Corpus evalCorpus = corpus.getEvaluationCorpus(9);
 
-		for (int featureIndes = 0; featureIndes < FeatureExtractor.featureSize; featureIndes++) {
+		/*for (int featureIndes = 0; featureIndes < FeatureExtractor.featureSize; featureIndes++) {
 			char[] a = trainCorpus.getFeatureExtractor().getFeatureValues()[featureIndes];
 			char[] b = evalCorpus.getFeatureExtractor().getFeatureValues()[featureIndes];
 			System.out.println(a.length+" \t"+b.length);
@@ -95,7 +97,6 @@ public class TestCorpus {
 			}
 		}
 		*/
-		System.out.println("done");
 
 		/*
 		System.out.println("start training...");
@@ -108,11 +109,11 @@ public class TestCorpus {
 		System.out.println("hmm trained after " + (hmmTrained - corpusCreated) + "ms");
 		hmm.writeModelToFile("model");
 		System.out.println("model written to file \"model\".");
-		hmm.printTransitionProbs();
+		//hmm.printTransitionProbs();
 		System.out.println();
         */
 
-        /*
+		System.out.println("read model from file...");
 		HMM hmm = new HMM("model");
 		evalCorpus.writeContentToFile("evalCorpus");
 		hmm.setCorpus(evalCorpus);
@@ -120,7 +121,7 @@ public class TestCorpus {
 		taggedCorpus.writeContentToFile("taggedCorpus");
 		Evaluator evaluator = new Evaluator();
 		System.out.println("FMeasure: "+evaluator.getSimpleFMeasure(evalCorpus, taggedCorpus));
-		*/
+
 
 		//hmm.printEmissionProbs(4);
 		/*System.out.println("start tagging...");
