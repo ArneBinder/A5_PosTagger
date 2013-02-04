@@ -73,11 +73,12 @@ public class Evaluator {
 		final int partitionCount = 10;
 		long startTime = System.currentTimeMillis();
 		TagSet tagSet = new TagSet("");
+		FeatureExtractor featureExtractor = new FeatureExtractor();
 		Corpus corpus = new Corpus(tagSet);
 		int i = 0;
 		for (String fileName : Helper.getFileList("brown_learn")) {
 			//System.out.println(brown_learn);
-			corpus.addContentFromFile("brown_learn\\" + fileName);
+			corpus.addContentFromFile("brown_learn\\" + fileName, featureExtractor);
 			//if(i>100)
 			//	break;
 			i++;

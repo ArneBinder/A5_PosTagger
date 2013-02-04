@@ -13,6 +13,7 @@ public class Sentence {
 	private byte[] tags;
 	private int length;
 	private TagSet tagSet;
+	private FeatureVector[] features;
 
 	public int length() {
 		return length;
@@ -30,7 +31,11 @@ public class Sentence {
 		return tags;
 	}
 
-	Sentence(String sentence, TagSet tagSet) {
+	public FeatureVector getFeature(int i){
+		return features[i];
+	}
+
+	Sentence(String sentence, TagSet tagSet, FeatureExtractor featureExtractor) {
 		this.tagSet = tagSet;
 		sentence = sentence.trim();
 		String[] tempWords = sentence.split(" ");
@@ -51,7 +56,10 @@ public class Sentence {
 				this.tags[i] = -1;
 			}
 		}
-
+		this.features = new FeatureVector[length];
+		for (int i = 0; i < length; i++) {
+			this.features[i] = featureExtractor.constructFeature(this,i);
+		}
 	}
 
 	public String toString() {

@@ -22,12 +22,14 @@ public class Corpus {
 	private List<Sentence> content;
 	private List<Sentence>[] partition;
 	private TagSet tagSet;
+	//private FeatureExtractor featureExtractor;
 
 	///////// Methods ////////////
 
-	Corpus(TagSet tagSet) {
+	Corpus(TagSet tagSet/*, FeatureExtractor featureExtractor*/) {
 		content = new ArrayList<Sentence>();
 		this.tagSet = tagSet;
+		//this.featureExtractor = featureExtractor;
 	}
 
 	public List<Sentence> getContent() {
@@ -50,12 +52,21 @@ public class Corpus {
 		return content.size();
 	}
 
+	/*public FeatureExtractor getFeatureExtractor() {
+		return featureExtractor;
+	}
+
+	public void setFeatureExtractor(FeatureExtractor featureExtractor) {
+		this.featureExtractor = featureExtractor;
+	}
+*/
+
 	/**
 	 * read text (from file)
 	 * - tagged or
 	 * - untagged
 	 */
-	public void addContentFromFile(String fileName) {
+	public void addContentFromFile(String fileName, FeatureExtractor featureExtractor) {
 		try {
 			FileInputStream fstream = new FileInputStream(fileName);
 			// Get the object of DataInputStream
@@ -65,7 +76,7 @@ public class Corpus {
 			//Read File Line By Line
 			while ((strLine = br.readLine()) != null) {
 				if (strLine.length() > 0) {
-					content.add(new Sentence(strLine, tagSet));
+					content.add(new Sentence(strLine, tagSet, featureExtractor));
 				}
 			}
 			//Close the input stream

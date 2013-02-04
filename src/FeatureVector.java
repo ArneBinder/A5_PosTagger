@@ -8,10 +8,10 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class FeatureVector {
-	public String[] features;
+	public int[] features;
 	//public static final byte size = 34; // ATTENTION: does not exceed 128
-	FeatureVector(String[] feats){
-		this.features = new String[feats.length];
+	FeatureVector(int[] feats){
+		this.features = new int[feats.length];
 		System.arraycopy(feats,0,features,0,feats.length);
 
 	}

@@ -12,15 +12,18 @@ public class POSTagging {
 			return;
 		}
 		final String modelName = "model";
+		final String featureValuesFile = "features";
 		String directory_name = args[1];
 		long startTime = System.currentTimeMillis();
 
 		if(args[0].equals("learn")){
 			TagSet tagSet = new TagSet("");
+			FeatureExtractor featureExtractor = new FeatureExtractor();
 			Corpus corpus = new Corpus(tagSet);
 			for (String fileName : Helper.getFileList(directory_name)) {
-				corpus.addContentFromFile(directory_name+"\\" + fileName);
+				corpus.addContentFromFile(directory_name+"\\" + fileName, featureExtractor);
 			}
+			featureExtractor.writeFeatureValuesToFile(featureValuesFile);
 			long corpusCreated = System.currentTimeMillis();
 			System.out.println("corpus created in " + (corpusCreated - startTime) + "ms");
 			System.out.println("total size: " + corpus.size() + " sentences.");
@@ -36,14 +39,16 @@ public class POSTagging {
 			System.out.println("done.");
 		}else if(args[0].equals("annotate")){
 			System.out.println("read model from file \""+modelName+"\"...");
+			FeatureExtractor featureExtractor = new FeatureExtractor(featureValuesFile);
 			HMM hmm = new HMM(modelName);
+
 			System.out.println(hmm.getTagSet());
 			//hmm.printEmissionProbs(0);
 			//hmm.printTransitionProbs();
 			for (String fileName : Helper.getFileList(directory_name)) {
 				Corpus corpus = new Corpus(hmm.getTagSet());
 				System.out.println("read sentences from file \""+directory_name+"\\"+fileName+"\"...");
-				corpus.addContentFromFile(directory_name + "\\" + fileName);
+				corpus.addContentFromFile(directory_name + "\\" + fileName, featureExtractor);
 				hmm.setCorpus(corpus);
 				System.out.println("tag sentences...");
 				Corpus taggedCorpus = hmm.tag();

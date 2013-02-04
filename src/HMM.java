@@ -26,7 +26,7 @@ public class HMM {
 	// prevGramPosTag<<8+posTag --> probability
 	HashMap<Long, Double> transitionProbs;
 	// pos-tag x feature-index x feature-value --> probability
-	HashMap<String, Double>[][] emissionProbs;
+	HashMap<Integer, Double>[][] emissionProbs;
 
 
 	private Corpus corpus;
@@ -70,22 +70,22 @@ public class HMM {
 		}
 	}
 
-	public void printEmissionProbs(int featureIndex) {
+	/*public void printEmissionProbs(int featureIndex) {
 		System.out.println("emissionProbs:");
 		for (byte posTag = 0; posTag < tagSet.size(); posTag++) {
 			String tagStr = tagSet.tagToString(posTag);
 			int size = emissionProbs[posTag][featureIndex].size();
-			for (Map.Entry<String, Double> entry : emissionProbs[posTag][featureIndex].entrySet()) {
-				System.out.println(tagStr + "\t	--> " + entry.getKey() + ":\t" + Math.exp(entry.getValue()));
+			for (Map.Entry<Integer, Double> entry : emissionProbs[posTag][featureIndex].entrySet()) {
+				System.out.println(tagStr + "\t	--> " + corpus.getFeatureExtractor().getFeatureValueString(entry.getKey(),featureIndex) + ":\t" + Math.exp(entry.getValue()));
 			}
 		}
-	}
+	} */
 
 	public void train() {
 		System.out.println("corpus.size(): " + corpus.size());
 		Multiset<Long> transitionCounts = HashMultiset.create();
 		Multiset<Long> totalTransitions = HashMultiset.create();
-		Multiset<String>[][] emissionCounts = new Multiset[FeatureExtractor.featureSize][tagSet.size()]; // saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
+		Multiset<Integer>[][] emissionCounts = new Multiset[FeatureExtractor.featureSize][tagSet.size()]; // saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
 		Multiset<Byte> totalEmissions = HashMultiset.create(); //saves how often a posGram occurs in total
 		int allTransitionCount; //STATS
 		for (int i = 0; i < emissionCounts.length; i++) {
@@ -101,7 +101,7 @@ public class HMM {
 		for (int i = 0; i < FeatureExtractor.featureSize; i++) {
 			lastSize[i] = 0;
 		}
-		FeatureExtractor featureExtractor = new FeatureExtractor();
+		//FeatureExtractor featureExtractor = new FeatureExtractor();
 		int curSenIndex = 0;
 		long time = System.currentTimeMillis();
 		for (Sentence sentence : corpus.getContent()) {
@@ -134,7 +134,8 @@ public class HMM {
 				////
 				// Features des aktuellen Wortes extrahieren & (gramTag --> Features) zaehlen
 
-				FeatureVector featureVector = featureExtractor.getFeatures(sentence, i);
+				//FeatureVector featureVector = featureExtractor.getFeatures(sentence, i);
+				FeatureVector featureVector = sentence.getFeature(i);
 
 				for (int j = 0; j < FeatureExtractor.featureSize; j++) {
 					//TODO: check, if Pair works correct
@@ -174,7 +175,7 @@ public class HMM {
 		emissionProbs = new HashMap[tagSet.size()][FeatureExtractor.featureSize];
 		for (int i = 0; i < tagSet.size(); i++) {
 			for (int j = 0; j < FeatureExtractor.featureSize; j++) {
-				emissionProbs[i][j] = new HashMap<String, Double>();
+				emissionProbs[i][j] = new HashMap<Integer, Double>();
 			}
 		}
 		System.out.println("normalize emissionProbs...");
@@ -184,7 +185,7 @@ public class HMM {
 
 
 				//emissionCounts[featureIndex].entrySet().iterator()
-				for (Multiset.Entry<String> entry : emissionCounts[featureIndex][tagIndex].entrySet()) {
+				for (Multiset.Entry<Integer> entry : emissionCounts[featureIndex][tagIndex].entrySet()) {
 					int entryCount = entry.getCount();
 					int totalCount = totalEmissions.count(tagIndex);
 					//byte posTag = entry.getElement().getKey();
@@ -245,7 +246,7 @@ public class HMM {
 
 	public Corpus tag() {
 		System.out.println("sentences: " + corpus.size());
-		Corpus taggedCorpus = new Corpus(tagSet);
+		Corpus taggedCorpus = new Corpus(tagSet/* corpus.getFeatureExtractor()*/);
 		for (int i = 0; i < corpus.size(); i++) {
 			System.out.print(i + ": ");
 			Sentence taggedSentence = tagSentence(corpus.getSentence(i));
@@ -258,7 +259,7 @@ public class HMM {
 	}
 
 	private Sentence tagSentence(Sentence sentence) {
-		FeatureExtractor featureExtractor = new FeatureExtractor();
+		//FeatureExtractor featureExtractor = new FeatureExtractor();
 		double[][] pathProbs = new double[sentence.length() + 1][tagSet.size()];
 		byte[][] sourceTags = new byte[sentence.length()][tagSet.size()];
 		// set initial transition probabilities
@@ -273,7 +274,8 @@ public class HMM {
 		// for all words do...
 		for (int currentWordIndex = 0; currentWordIndex < sentence.length(); currentWordIndex++) {
 			String word = sentence.getWord(currentWordIndex);
-			FeatureVector featureVector = featureExtractor.getFeatures(sentence, currentWordIndex);
+			//FeatureVector featureVector = featureExtractor.getFeatures(sentence, currentWordIndex);
+			FeatureVector featureVector = sentence.getFeature(currentWordIndex);
 			tagGramCoded &= 0xFFFFFFFFFFFFFF00L;
 			for (byte currentTagIndex = 0; currentTagIndex < tagSet.size(); currentTagIndex++) {
 				double maxProb = -Double.MAX_VALUE;
@@ -464,14 +466,17 @@ public class HMM {
 			for (int posTagIndex = 0; posTagIndex < tagSet.size(); posTagIndex++) {
 				for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
 					int listLength = inputStream.readInt();
-					emissionProbs[posTagIndex][featureIndex] = new HashMap<String, Double>(listLength);
+					emissionProbs[posTagIndex][featureIndex] = new HashMap<Integer, Double>(listLength);
 					for (int i = 0; i < listLength; i++) {
-						int strLength = inputStream.readInt();
+
+						int featureValue = inputStream.readInt();
+						/*int strLength = inputStream.readInt();
 						char[] chars = new char[strLength];
 						for (int j = 0; j < strLength; j++) {
 							chars[j] = inputStream.readChar();
-						}
-						emissionProbs[posTagIndex][featureIndex].put(String.valueOf(chars), inputStream.readDouble());
+						} */
+						//emissionProbs[posTagIndex][featureIndex].put(String.valueOf(chars), inputStream.readDouble());
+						emissionProbs[posTagIndex][featureIndex].put(featureValue, inputStream.readDouble());
 					}
 				}
 			}
@@ -484,8 +489,21 @@ public class HMM {
 				double value = inputStream.readDouble();
 				transitionProbs.put(key, value);
 			}
-			inputStream.close();
 
+			/*
+			// read featureValues
+			char[][] featureValues = new char[FeatureExtractor.featureSize][];
+			for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
+				int valueSize = inputStream.readInt();
+				featureValues[featureIndex] = new char[valueSize];
+				for (int valueIndex = 0; valueIndex < valueSize; valueIndex++) {
+					featureValues[featureIndex][valueIndex] = inputStream.readChar();
+				}
+			}
+			FeatureExtractor featureExtractor = new FeatureExtractor(featureValues);
+			corpus.setFeatureExtractor(featureExtractor);
+             */
+			inputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
@@ -518,12 +536,14 @@ public class HMM {
 					//ein Eintrag! vorher anzahl speichern
 					outputStream.writeInt((emissionProbs[posTagIndex][featureIndex].size()));
 					//System.out.println(posTagIndex + "\t" + featureIndex + "\t" + emissionProbs[posTagIndex][featureIndex].size());
-					for (Map.Entry<String, Double> entry : emissionProbs[posTagIndex][featureIndex].entrySet()) {
-						char[] featureValue = entry.getKey().toCharArray();
-						outputStream.writeInt(featureValue.length);
-						for (char c : featureValue) {
+					for (Map.Entry<Integer, Double> entry : emissionProbs[posTagIndex][featureIndex].entrySet()) {
+						//char[] featureValue = entry.getKey().toCharArray();
+						int featureValue = entry.getKey();
+						//outputStream.writeInt(featureValue.length);
+						outputStream.writeInt(featureValue);
+						/*for (char c : featureValue) {
 							outputStream.writeChar(c);
-						}
+						} */
 						outputStream.writeDouble(entry.getValue());
 						//if (!entry.getValue().isInfinite())
 						//	System.out.println(posTagIndex + "\t" + featureIndex + "\t" + entry.getKey() + "\t" + entry.getValue());
@@ -538,6 +558,17 @@ public class HMM {
 				outputStream.writeDouble(entry.getValue());
 			}
 
+			/*
+			//write featureValues
+			char[][] featureValues = corpus.getFeatureExtractor().getFeatureValues();
+			for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
+				int size = featureValues[featureIndex].length;
+				outputStream.writeInt(size);
+				for (int valueIndex = 0; valueIndex < size; valueIndex++) {
+					outputStream.writeChar(featureValues[featureIndex][valueIndex]);
+				}
+			}
+            */
 			outputStream.flush();
 			outputStream.close();
 		} catch (IOException e) {

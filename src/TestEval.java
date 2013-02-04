@@ -7,11 +7,14 @@
  */
 public class TestEval {
 	public static void main(String[] args) {
-		Corpus evalCorpus = new Corpus(new TagSet(""));
-		evalCorpus.addContentFromFile("evalCorpus");
+		TagSet tagSet = new TagSet("");
+		FeatureExtractor featureExtractor = new FeatureExtractor();
+		Corpus evalCorpus = new Corpus(tagSet);
+		evalCorpus.addContentFromFile("evalCorpus", featureExtractor);
+		Corpus taggedCorpus = new Corpus(tagSet);
+		taggedCorpus.addContentFromFile("taggedCorpus", featureExtractor);
+
 		System.out.println(evalCorpus.size());
-		Corpus taggedCorpus = new Corpus(new TagSet(""));
-		taggedCorpus.addContentFromFile("taggedCorpus");
 		System.out.println(taggedCorpus.size());
 		Evaluator evaluator = new Evaluator();
 		System.out.println(evaluator.getSimpleFMeasure(evalCorpus, taggedCorpus));
