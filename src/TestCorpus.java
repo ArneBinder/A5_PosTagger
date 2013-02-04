@@ -24,30 +24,35 @@ public class TestCorpus {
 		System.out.println("fiels to read: " + Helper.getFileList(directoryName).length);
 		for (String fileName : Helper.getFileList(directoryName)) {
 			//System.out.println(brown_learn);
-			System.out.println(i);
+			System.out.println(i+":\t"+corpus.size());
 			corpus.addContentFromFile(directoryName + "\\" + fileName, featureExtractor);
 			if (corpus.size() > 45000)
 				break;
-			if (i > 97)
+			if (i > 197)
 				break;
 			i++;
 		}
+
+
+		//for (int j = 0; j < FeatureExtractor.featureSize; j++) {
+		//	System.out.println(featureExtractor.getFeatureValues(j).size());
+		//}
 		System.out.println("write featureValues to file...");
-		featureExtractor.writeFeatureValuesToFile("featureValues");
+		featureExtractor.writeFeatureValuesToFile("featureValues", false);
 		System.out.println("done.");
 
-		/*
+
 		FeatureExtractor f2 = new FeatureExtractor("featureValues");
-		for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
-			HashMap<String, Integer> a = featureExtractor.getFeatureValues(featureIndex);
-			HashMap<String, Integer> b = f2.getFeatureValues(featureIndex);
+		//for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
+			HashMap<String, Integer> a = featureExtractor.getFeatureValues();
+			HashMap<String, Integer> b = f2.getFeatureValues();
 			System.out.println(a.size()+" "+b.size());
 			for (Map.Entry<String, Integer> entry : a.entrySet()) {
 				if(!b.get(entry.getKey()).equals(entry.getValue()))
 					System.out.println(b.get(entry.getKey())+"!="+entry.getValue());
 			}
-		}
-		*/
+		//}
+
 
 		/*long corpusCreated = System.currentTimeMillis();
 		System.out.println("corpus created after " + (corpusCreated - startTime) + "ms");

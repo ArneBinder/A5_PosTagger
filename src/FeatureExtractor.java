@@ -35,34 +35,36 @@ public class FeatureExtractor {
 	static int MAX_PREFIX_LENGTH = 0;
 	static int MAX_SUFFIX_LENGTH = 0;
 	public static int featureSize = 10 + 3 * (MAX_SUFFIX_LENGTH + MAX_PREFIX_LENGTH);
+	//private static int[] intialCapacities = {40000,2,2,2,2,40000,40000,20,20,20};
 
-	private HashMap<String, Integer>[] featureValues = new HashMap[featureSize];
+	private HashMap<String, Integer> featureValues = new HashMap<String, Integer>();
 
 	public FeatureExtractor() {
-		initFeatureValues();
+		//initFeatureValues();
+
 	}
 
-	public HashMap<String, Integer> getFeatureValues(int featureIndex) {
-		return featureValues[featureIndex];
+	public HashMap<String, Integer> getFeatureValues() {
+		return featureValues;
 	}
 
-	private void initFeatureValues() {
+	/*private void initFeatureValues() {
 		for (int i = 0; i < featureSize; i++) {
-			featureValues[i] = new HashMap<String, Integer>();//new BidiMap<String, Integer>();
+			featureValues[i] = new HashMap<String, Integer>(intialCapacities[i]);//new BidiMap<String, Integer>();
 		}
-	}
+	} */
 
 	public FeatureExtractor(String fileName) {
-		initFeatureValues();
+		//initFeatureValues();
 		readFeatureValuesFromFile(fileName);
 	}
 
-	private int getFeatureValue(String value, int featureIndex) {
+	private int getFeatureValue(String value) {
 		try {
-			return featureValues[featureIndex].get(value);
+			return featureValues.get(value);
 		} catch (Exception e) {
-			featureValues[featureIndex].put(value, featureValues[featureIndex].size());
-			return featureValues[featureIndex].size() - 1;
+			featureValues.put(value, featureValues.size());
+			return featureValues.size() - 1;
 		}
 	}
 
@@ -75,7 +77,7 @@ public class FeatureExtractor {
 		//ObjectToDoubleMap<String> feats
 		//		= new ObjectToDoubleMap<String>();
 		String token = normToken(sentence.getWord(n));
-		feats[0] = getFeatureValue(token, 0);
+		feats[0] = getFeatureValue(token);
 
 		boolean bos = n == 0;
 		boolean eos = (n + 1) >= sentence.length();
@@ -95,61 +97,61 @@ public class FeatureExtractor {
 
 		if (bos)
 			//feats.set("BOS", 1.0);
-			feats[1] = getFeatureValue("1", 1);
+			feats[1] = getFeatureValue("1");
 		//else feats[0] = "0";
 		if (eos)
 			//feats.set("EOS", 1.0);
-			feats[2] = getFeatureValue("1", 2);
+			feats[2] = getFeatureValue("1");
 		//else feats[1] = "0";
 		if (!bos && !eos)
 			//feats.set("!BOS!EOS", 1.0);
-			feats[3] = getFeatureValue("1", 3);
+			feats[3] = getFeatureValue("1");
 		//else feats[2] = "0";
 		//feats.set("TOK_" + token, 1.0);
 
 		if (!bos)
 			//feats.set("TOK_PREV_" + prevToken, 1.0);
-			feats[5] = getFeatureValue(prevToken, 5);
+			feats[5] = getFeatureValue(prevToken);
 		//else feats[5] = "";
 		if (!eos)
 			//feats.set("TOK_NEXT_" + nextToken, 1.0);
-			feats[6] = getFeatureValue(nextToken, 6);
+			feats[6] = getFeatureValue(nextToken);
 		//else feats[6] = "";
 		//feats.set("TOK_CAT_" + tokenCat, 1.0);
-		feats[7] = getFeatureValue(tokenCat, 7);
+		feats[7] = getFeatureValue(tokenCat);
 		if (!bos)
 			//feats.set("TOK_CAT_PREV_" + prevTokenCat, 1.0);
-			feats[8] = getFeatureValue(prevTokenCat, 8);
+			feats[8] = getFeatureValue(prevTokenCat);
 		//else feats[8] = "";
 		if (!eos)
 			//feats.set("TOK_CAT_NEXT_" + nextTokenCat, 1.0);
-			feats[9] = getFeatureValue(nextTokenCat, 9);
+			feats[9] = getFeatureValue(nextTokenCat);
 		//else feats[9] = "";
 
 		//List<String> suffix = suffixes(token);
 		int startIndex = 10;
 		int index = startIndex;
 		for (String suffix : suffixes(token)) {
-			feats[index] = getFeatureValue(suffix, index);
+			feats[index] = getFeatureValue(suffix);
 			index++;
 		}
 		startIndex += MAX_SUFFIX_LENGTH;
 		index = startIndex;
 		for (String prefix : prefixes(token)) {
-			feats[index] = getFeatureValue(prefix, index);
+			feats[index] = getFeatureValue(prefix);
 			index++;
 		}
 		startIndex += MAX_PREFIX_LENGTH;
 		index = startIndex;
 		if (!bos) {
 			for (String suffix : suffixes(prevToken)) {
-				feats[index] = getFeatureValue(suffix, index);
+				feats[index] = getFeatureValue(suffix);
 				index++;
 			}
 			startIndex += MAX_SUFFIX_LENGTH;
 			index = startIndex;
 			for (String prefix : prefixes(prevToken)) {
-				feats[index] = getFeatureValue(prefix, index);
+				feats[index] = getFeatureValue(prefix);
 				index++;
 			}
 			startIndex += MAX_PREFIX_LENGTH;
@@ -162,13 +164,13 @@ public class FeatureExtractor {
 
 		if (!eos) {
 			for (String suffix : suffixes(nextToken)) {
-				feats[index] = getFeatureValue(suffix, index);
+				feats[index] = getFeatureValue(suffix);
 				index++;
 			}
 			startIndex += MAX_SUFFIX_LENGTH;
 			index = startIndex;
 			for (String prefix : prefixes(nextToken)) {
-				feats[index] = getFeatureValue(prefix, index);
+				feats[index] = getFeatureValue(prefix);
 				index++;
 			}
 			startIndex += MAX_PREFIX_LENGTH;
@@ -256,7 +258,7 @@ public class FeatureExtractor {
 		return OTHER_CLASS;
 	}
 
-	public void writeFeatureValuesToFile(String fileName) {
+	public void writeFeatureValuesToFile(String fileName, boolean reset) {
 		DataOutputStream outputStream;
 		try {
 			outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(fileName)));
@@ -266,18 +268,19 @@ public class FeatureExtractor {
 		}
 		try {
 			//write featureValues
-			for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
-				int featureSize = featureValues[featureIndex].size();
+			//for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
+				int featureSize = featureValues.size();
 				//System.out.println(featureSize);
 				outputStream.writeInt(featureSize);
-				for (Map.Entry<String, Integer> entry : featureValues[featureIndex].entrySet()) {
+				for (Map.Entry<String, Integer> entry : featureValues.entrySet()) {
 					Helper.writeString(outputStream,entry.getKey());
 					outputStream.writeInt(entry.getValue());
 				}
-			}
+			//}
 			outputStream.flush();
 			outputStream.close();
-			resetFeatureValues();
+			if(reset)
+				resetFeatureValues();
 		} catch (IOException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
@@ -294,14 +297,14 @@ public class FeatureExtractor {
 
 		try {
 			// read featureValues
-			for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
+			//for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
 				int currentFeatureSize = inputStream.readInt();
-				featureValues[featureIndex] = new HashMap<String, Integer>(currentFeatureSize);
+				featureValues = new HashMap<String, Integer>(currentFeatureSize);
 				for (int valueIndex = 0; valueIndex < currentFeatureSize; valueIndex++) {
 					String value = Helper.readString(inputStream);
-					featureValues[featureIndex].put(value,inputStream.readInt());
+					featureValues.put(value,inputStream.readInt());
 				}
-			}
+			//}
 			inputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -309,9 +312,9 @@ public class FeatureExtractor {
 	}
 
 	void resetFeatureValues() {
-		for (int featureIndex = 0; featureIndex < featureSize; featureIndex++) {
-			this.featureValues[featureIndex] = new HashMap<String, Integer>();//new BidiMap<String, Integer>();
-		}
+		//for (int featureIndex = 0; featureIndex < featureSize; featureIndex++) {
+			this.featureValues.clear();//new BidiMap<String, Integer>();
+		//}
 	}
 
 

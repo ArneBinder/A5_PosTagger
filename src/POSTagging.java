@@ -23,7 +23,7 @@ public class POSTagging {
 			for (String fileName : Helper.getFileList(directory_name)) {
 				corpus.addContentFromFile(directory_name+"\\" + fileName, featureExtractor);
 			}
-			featureExtractor.writeFeatureValuesToFile(featureValuesFile);
+			featureExtractor.writeFeatureValuesToFile(featureValuesFile, true);
 			long corpusCreated = System.currentTimeMillis();
 			System.out.println("corpus created in " + (corpusCreated - startTime) + "ms");
 			System.out.println("total size: " + corpus.size() + " sentences.");
