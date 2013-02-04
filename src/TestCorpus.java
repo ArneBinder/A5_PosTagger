@@ -26,7 +26,7 @@ public class TestCorpus {
 			corpus.addContentFromFile(directoryName + "\\" + fileName, featureExtractor);
 			if(corpus.size() > 45000)
 				break;
-			if(i > 97)
+			if(i > 197)
 				break;
 			i++;
 		}
@@ -35,15 +35,15 @@ public class TestCorpus {
 		System.out.println("done.");
 		FeatureExtractor f2 = new FeatureExtractor("featureValues");
 
-		for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
+		/*for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
 			BidiMap<String, Integer> a = featureExtractor.getFeatureValues(featureIndex);
 			BidiMap<String, Integer> b = f2.getFeatureValues(featureIndex);
 			System.out.println(a.size()+" "+b.size());
 			for (int j = 0; j < a.size(); j++) {
-				if(a.getKey(j).equals(b.getKey(j)))
+				if(!a.getKey(j).equals(b.getKey(j)))
 					System.out.println(a.getKey(j)+"!="+b.getKey(j));
 			}
-		}
+		} */
 
 		/*long corpusCreated = System.currentTimeMillis();
 		System.out.println("corpus created after " + (corpusCreated - startTime) + "ms");

@@ -1,6 +1,5 @@
 
-import java.io.File;
-import java.io.FilenameFilter;
+import java.io.*;
 import java.text.Bidi;
 import java.util.HashMap;
 
@@ -35,7 +34,7 @@ public class Helper {
 		gramMask.put(7, 0xFFFFFFFFFFFFFFL);
 	}
 
-	public static String[] getFileList(String directoryPath){
+	public static String[] getFileList(String directoryPath) {
 		File dir = new File(directoryPath);
 		String[] fileList = dir.list();
 		return fileList;
@@ -56,6 +55,21 @@ public class Helper {
 	} */
 
 
+	public static String readString(DataInputStream inputStream) throws IOException {
+		int strLength = inputStream.readInt();
+		char[] chars = new char[strLength];
+		for (int j = 0; j < strLength; j++) {
+			chars[j] = inputStream.readChar();
+		}
+		return String.valueOf(chars);
+	}
+
+	public static void writeString(DataOutputStream outputStream, String string)throws IOException{
+		outputStream.writeInt(string.length());
+		for (char c : string.toCharArray()) {
+			outputStream.writeChar(c);
+		}
+	}
 
 
 }

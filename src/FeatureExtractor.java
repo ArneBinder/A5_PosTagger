@@ -274,13 +274,16 @@ public class FeatureExtractor {
 			//write featureValues
 			for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
 				int featureSize = featureValues[featureIndex].size();
+				//System.out.println(featureSize);
 				outputStream.writeInt(featureSize);
 				for (int valueIndex = 0; valueIndex < featureSize; valueIndex++) {
 					//size+=featureValues[featureIndex].getKey(valueIndex).length()+1;
 					String featureValue = featureValues[featureIndex].getKey(valueIndex);
-					int valueSize = featureValue.length();
-					outputStream.writeInt(valueSize);
-					outputStream.writeChars(featureValue);
+					//int valueSize = featureValue.length();
+					//outputStream.writeInt(valueSize);
+					Helper.writeString(outputStream,featureValue);
+					//outputStream.writeChars(featureValue);
+
 				}
 			}
 
@@ -309,25 +312,16 @@ public class FeatureExtractor {
 				featureValues[featureIndex] = new BidiMap<String, Integer>();
 				for (int valueIndex = 0; valueIndex < featureSize; valueIndex++) {
 					//size+=featureValues[featureIndex].getKey(valueIndex).length()+1;
-					int valueSize = inputStream.readInt();
+					String value = Helper.readString(inputStream);
+					/*int valueSize = inputStream.readInt();
 					char[] value = new char[valueSize];
 					for (int valuePos = 0; valuePos < valueSize; valuePos++) {
 						value[valuePos] = inputStream.readChar();
-					}
-					featureValues[featureIndex].put(String.valueOf(value),inputStream.readInt());
+					} */
+					//featureValues[featureIndex].put(String.valueOf(value),inputStream.readInt());
+					featureValues[featureIndex].put(value,valueIndex);
 				}
 			}
-
-			char[][] featureValues = new char[FeatureExtractor.featureSize][];
-			for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
-				int valueSize = inputStream.readInt();
-				featureValues[featureIndex] = new char[valueSize];
-				for (int valueIndex = 0; valueIndex < valueSize; valueIndex++) {
-
-					featureValues[featureIndex][valueIndex] = inputStream.readChar();
-				}
-			}
-
 
 			inputStream.close();
 
