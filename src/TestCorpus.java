@@ -1,7 +1,9 @@
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,31 +21,33 @@ public class TestCorpus {
 		Corpus corpus = new Corpus(tagSet);
 
 		int i = 0;
-		System.out.println("fiels to read: "+Helper.getFileList(directoryName).length);
+		System.out.println("fiels to read: " + Helper.getFileList(directoryName).length);
 		for (String fileName : Helper.getFileList(directoryName)) {
 			//System.out.println(brown_learn);
 			System.out.println(i);
 			corpus.addContentFromFile(directoryName + "\\" + fileName, featureExtractor);
-			if(corpus.size() > 45000)
+			if (corpus.size() > 45000)
 				break;
-			if(i > 197)
+			if (i > 97)
 				break;
 			i++;
 		}
 		System.out.println("write featureValues to file...");
 		featureExtractor.writeFeatureValuesToFile("featureValues");
 		System.out.println("done.");
-		FeatureExtractor f2 = new FeatureExtractor("featureValues");
 
-		/*for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
-			BidiMap<String, Integer> a = featureExtractor.getFeatureValues(featureIndex);
-			BidiMap<String, Integer> b = f2.getFeatureValues(featureIndex);
+		/*
+		FeatureExtractor f2 = new FeatureExtractor("featureValues");
+		for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
+			HashMap<String, Integer> a = featureExtractor.getFeatureValues(featureIndex);
+			HashMap<String, Integer> b = f2.getFeatureValues(featureIndex);
 			System.out.println(a.size()+" "+b.size());
-			for (int j = 0; j < a.size(); j++) {
-				if(!a.getKey(j).equals(b.getKey(j)))
-					System.out.println(a.getKey(j)+"!="+b.getKey(j));
+			for (Map.Entry<String, Integer> entry : a.entrySet()) {
+				if(!b.get(entry.getKey()).equals(entry.getValue()))
+					System.out.println(b.get(entry.getKey())+"!="+entry.getValue());
 			}
-		} */
+		}
+		*/
 
 		/*long corpusCreated = System.currentTimeMillis();
 		System.out.println("corpus created after " + (corpusCreated - startTime) + "ms");

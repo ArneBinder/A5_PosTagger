@@ -36,26 +36,21 @@ public class FeatureExtractor {
 	static int MAX_SUFFIX_LENGTH = 0;
 	public static int featureSize = 10 + 3 * (MAX_SUFFIX_LENGTH + MAX_PREFIX_LENGTH);
 
-	private BidiMap<String, Integer>[] featureValues = new BidiMap[featureSize];
+	private HashMap<String, Integer>[] featureValues = new HashMap[featureSize];
 
 	public FeatureExtractor() {
 		initFeatureValues();
 	}
 
-	public BidiMap<String, Integer> getFeatureValues(int featureIndex) {
+	public HashMap<String, Integer> getFeatureValues(int featureIndex) {
 		return featureValues[featureIndex];
 	}
 
 	private void initFeatureValues() {
 		for (int i = 0; i < featureSize; i++) {
-			featureValues[i] = new BidiMap<String, Integer>();
+			featureValues[i] = new HashMap<String, Integer>();//new BidiMap<String, Integer>();
 		}
 	}
-
-	public String getFeatureValueString(int featureValue, int featureIndex) {
-		return featureValues[featureIndex].getKey(featureValue);
-	}
-
 
 	public FeatureExtractor(String fileName) {
 		initFeatureValues();
@@ -269,27 +264,20 @@ public class FeatureExtractor {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 			return;
 		}
-
 		try {
 			//write featureValues
 			for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
 				int featureSize = featureValues[featureIndex].size();
 				//System.out.println(featureSize);
 				outputStream.writeInt(featureSize);
-				for (int valueIndex = 0; valueIndex < featureSize; valueIndex++) {
-					//size+=featureValues[featureIndex].getKey(valueIndex).length()+1;
-					String featureValue = featureValues[featureIndex].getKey(valueIndex);
-					//int valueSize = featureValue.length();
-					//outputStream.writeInt(valueSize);
-					Helper.writeString(outputStream,featureValue);
-					//outputStream.writeChars(featureValue);
-
+				for (Map.Entry<String, Integer> entry : featureValues[featureIndex].entrySet()) {
+					Helper.writeString(outputStream,entry.getKey());
+					outputStream.writeInt(entry.getValue());
 				}
 			}
-
 			outputStream.flush();
 			outputStream.close();
-			//resetFeatureValues();
+			resetFeatureValues();
 		} catch (IOException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
@@ -304,27 +292,17 @@ public class FeatureExtractor {
 			return;
 		}
 
-		// pos-tag x feature-index x feature-value --> probability
 		try {
 			// read featureValues
 			for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
-				int featureSize = inputStream.readInt();//featureValues[featureIndex].size();
-				featureValues[featureIndex] = new BidiMap<String, Integer>();
-				for (int valueIndex = 0; valueIndex < featureSize; valueIndex++) {
-					//size+=featureValues[featureIndex].getKey(valueIndex).length()+1;
+				int currentFeatureSize = inputStream.readInt();
+				featureValues[featureIndex] = new HashMap<String, Integer>(currentFeatureSize);
+				for (int valueIndex = 0; valueIndex < currentFeatureSize; valueIndex++) {
 					String value = Helper.readString(inputStream);
-					/*int valueSize = inputStream.readInt();
-					char[] value = new char[valueSize];
-					for (int valuePos = 0; valuePos < valueSize; valuePos++) {
-						value[valuePos] = inputStream.readChar();
-					} */
-					//featureValues[featureIndex].put(String.valueOf(value),inputStream.readInt());
-					featureValues[featureIndex].put(value,valueIndex);
+					featureValues[featureIndex].put(value,inputStream.readInt());
 				}
 			}
-
 			inputStream.close();
-
 		} catch (IOException e) {
 			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
 		}
@@ -332,7 +310,7 @@ public class FeatureExtractor {
 
 	void resetFeatureValues() {
 		for (int featureIndex = 0; featureIndex < featureSize; featureIndex++) {
-			this.featureValues[featureIndex] = new BidiMap<String, Integer>();
+			this.featureValues[featureIndex] = new HashMap<String, Integer>();//new BidiMap<String, Integer>();
 		}
 	}
 
