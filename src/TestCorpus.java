@@ -24,12 +24,12 @@ public class TestCorpus {
 		System.out.println("fiels to read: " + Helper.getFileList(directoryName).length);
 		for (String fileName : Helper.getFileList(directoryName)) {
 			//System.out.println(brown_learn);
-			System.out.println(i+":\t"+corpus.size());
+			System.out.println(i+":\t"+corpus.size()+"\t"+featureExtractor.getFeatureValues().size());
 			corpus.addContentFromFile(directoryName + "\\" + fileName, featureExtractor);
 			if (corpus.size() > 45000)
 				break;
-			if (i > 197)
-				break;
+			if (i > 200)
+			 	break;
 			i++;
 		}
 
@@ -41,7 +41,7 @@ public class TestCorpus {
 		featureExtractor.writeFeatureValuesToFile("featureValues", false);
 		System.out.println("done.");
 
-
+		/*
 		FeatureExtractor f2 = new FeatureExtractor("featureValues");
 		//for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
 			HashMap<String, Integer> a = featureExtractor.getFeatureValues();
@@ -52,7 +52,7 @@ public class TestCorpus {
 					System.out.println(b.get(entry.getKey())+"!="+entry.getValue());
 			}
 		//}
-
+        */
 
 		/*long corpusCreated = System.currentTimeMillis();
 		System.out.println("corpus created after " + (corpusCreated - startTime) + "ms");

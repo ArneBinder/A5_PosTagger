@@ -37,7 +37,7 @@ public class FeatureExtractor {
 	public static int featureSize = 10 + 3 * (MAX_SUFFIX_LENGTH + MAX_PREFIX_LENGTH);
 	//private static int[] intialCapacities = {40000,2,2,2,2,40000,40000,20,20,20};
 
-	private HashMap<String, Integer> featureValues = new HashMap<String, Integer>();
+	private HashMap<String, Integer> featureValues = new HashMap<String, Integer>(40000);
 
 	public FeatureExtractor() {
 		//initFeatureValues();
