@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -85,8 +84,10 @@ public class Evaluator {
 		for (String fileName : Helper.getFileList("brown_learn")) {
 			//System.out.println(brown_learn);
 			corpus.addContentFromFile("brown_learn\\" + fileName, featureExtractor);
-			//if(i>100)
-			//	break;
+			if (corpus.size() > 45000)
+				break;
+			if (i > 300)
+				break;
 			i++;
 		}
 
@@ -106,25 +107,30 @@ public class Evaluator {
 			Corpus evalCorpus = corpus.getEvaluationCorpus(j);
 
 			HMM hmm = new HMM(trainCorpus, 1, tagSet);
+			hmm.train();
+			evalCorpus.writeContentToFile("evalCorpus"+j);
 			System.out.println("HMM initialized.");
 			System.out.println("start training...");
 			long startTagging = System.currentTimeMillis();
 			hmm.setCorpus(evalCorpus);
 			Corpus taggedEvalCorpus = hmm.tag();
 			long hmmTagged = System.currentTimeMillis();
+			taggedEvalCorpus.writeContentToFile("taggedCorpus"+j);
 			System.out.println("tagging done. " + (hmmTagged - startTagging) + "ms");
 			Evaluator evaluator = new Evaluator();
-			double fMeasure = evaluator.getFMeasure(corpus.getEvaluationCorpus(j), taggedEvalCorpus);
-			fSum += fMeasure;
-			System.out.println("F-Measure: " + fMeasure);
+			//double fMeasure = evaluator.getFMeasure(corpus.getEvaluationCorpus(j), taggedEvalCorpus);
+			//fSum += fMeasure;
+			//System.out.println("F-Measure: " + fMeasure);
 		}
+		/*
 		Collections.sort(fMeasures);
+
 		System.out.println(fMeasures);
 		double median = fMeasures.get((partitionCount / 2));
 		double mean = fSum / partitionCount;
 		System.out.println("mean: "+mean);
 		System.out.println("median: "+median);
-
+        */
 	}
 
 }

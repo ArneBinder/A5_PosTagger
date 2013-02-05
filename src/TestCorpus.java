@@ -1,10 +1,3 @@
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
 /**
  * Created with IntelliJ IDEA.
  * User: Arne
@@ -17,7 +10,7 @@ public class TestCorpus {
 		long startTime = System.currentTimeMillis();
 		final String directoryName = "brown_learn";
 		TagSet tagSet = new TagSet("");
-		FeatureExtractor featureExtractor = new FeatureExtractor();
+		/*FeatureExtractor featureExtractor = new FeatureExtractor();
 		Corpus corpus = new Corpus(tagSet);
 
 		int i = 0;
@@ -42,7 +35,7 @@ public class TestCorpus {
 		//featureExtractor.resetFeatureValues();
 		System.out.println("done.");
 		long corpusCreated = System.currentTimeMillis();
-
+          */
 		/*
 		FeatureExtractor f2 = new FeatureExtractor("featureValues");
 		//for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
@@ -82,21 +75,21 @@ public class TestCorpus {
 		//System.out.println(tagSet1);
 
 
-		System.out.println("construct partition...");
-		corpus.constructPartition(10);
-		Corpus trainCorpus = corpus.getTrainCorpus(9);
-		Corpus evalCorpus = corpus.getEvaluationCorpus(9);
+		//System.out.println("construct partition...");
+		//corpus.constructPartition(10);
+		for (int i = 0; i < 10; i++) {
 
-		/*for (int featureIndes = 0; featureIndes < FeatureExtractor.featureSize; featureIndes++) {
-			char[] a = trainCorpus.getFeatureExtractor().getFeatureValues()[featureIndes];
-			char[] b = evalCorpus.getFeatureExtractor().getFeatureValues()[featureIndes];
-			System.out.println(a.length+" \t"+b.length);
-			for (int valueIndex = 0; valueIndex < a.length; valueIndex++) {
-				if(a[valueIndex]!=b[valueIndex])
-					System.out.println(a[valueIndex]+"!="+b[valueIndex]);
-			}
+			FeatureExtractor featureExtractor2 = new FeatureExtractor();
+			FeatureExtractor featureExtractor3 = new FeatureExtractor();
+			//Corpus trainCorpus = corpus.getTrainCorpus(9);
+			Corpus evalCorpus = new Corpus(tagSet);
+			evalCorpus.addContentFromFile("evalCorpus"+i, featureExtractor2);
+			Corpus taggedCorpus = new Corpus(tagSet);
+			taggedCorpus.addContentFromFile("taggedCorpus"+i, featureExtractor3);
+
+			Evaluator evaluator = new Evaluator();
+			System.out.println("FMeasure: "+evaluator.getSimpleFMeasure(evalCorpus, taggedCorpus));
 		}
-		*/
 
 		/*
 		System.out.println("start training...");
@@ -112,7 +105,7 @@ public class TestCorpus {
 		//hmm.printTransitionProbs();
 		System.out.println();
         */
-
+		                                                               /*
 		System.out.println("read model from file...");
 		HMM hmm = new HMM("model");
 		evalCorpus.writeContentToFile("evalCorpus");
@@ -121,7 +114,7 @@ public class TestCorpus {
 		taggedCorpus.writeContentToFile("taggedCorpus");
 		Evaluator evaluator = new Evaluator();
 		System.out.println("FMeasure: "+evaluator.getSimpleFMeasure(evalCorpus, taggedCorpus));
-
+		                                                                  */
 
 		//hmm.printEmissionProbs(4);
 		/*System.out.println("start tagging...");

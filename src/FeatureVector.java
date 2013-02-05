@@ -1,5 +1,3 @@
-import java.util.HashMap;
-
 /**
  * Created with IntelliJ IDEA.
  * User: Arne

@@ -1,6 +1,3 @@
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created with IntelliJ IDEA.
  * User: Arne
@@ -34,6 +31,17 @@ public class Sentence {
 	public FeatureVector getFeature(int i){
 		return features[i];
 	}
+
+ 	Sentence(String[] words, byte[] tags, TagSet tagSet){
+		 this.tagSet = tagSet;
+		 //tags kopieren
+		 this.tags = new byte[tags.length];
+		 this.words = new String[words.length];
+		 System.arraycopy(tags, 0, this.tags,  0, tags.length);
+		 for (int i = 0; i < words.length; i++) {
+			 this.words[i] = words[i];
+		 }
+	 }
 
 	Sentence(String sentence, TagSet tagSet, FeatureExtractor featureExtractor) {
 		this.tagSet = tagSet;
