@@ -104,7 +104,7 @@ public class Evaluator {
 		double fSum = 0;
 		List<Double> fMeasures = new ArrayList<Double>();
 		for (int j = 0; j < partitionCount; j++) {
-			Corpus trainCorpus = corpus.getTrainCorpus(j);
+			Corpus trainCorpus = corpus.getTrainCorpus(j, partitionCount);
 			Corpus evalCorpus = corpus.getEvaluationCorpus(j);
 
 			HMM hmm = new HMM(trainCorpus, tagSet, featureValueCount);

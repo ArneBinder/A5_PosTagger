@@ -50,5 +50,27 @@ public class BidiMap<KeyType, ValueType> {
 		return keyToValueMap.size();
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof BidiMap)) return false;
+
+		BidiMap bidiMap = (BidiMap) o;
+
+		if(keyToValueMap.size()!=bidiMap.size()) return false;
+
+		for (Map.Entry<KeyType, ValueType> entry : keyToValueMap.entrySet()) {
+			KeyType key = entry.getKey();
+			ValueType v1 = entry.getValue();
+			ValueType v2 = (ValueType)bidiMap.get(key);
+			if(!v1.equals(v2)) return false;
+		}
+		if (!keyToValueMap.equals(bidiMap.keyToValueMap)) return false;
+		if (!valueToKeyMap.equals(bidiMap.valueToKeyMap)) return false;
+
+		return true;
+	}
+
+
 }
 

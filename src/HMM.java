@@ -49,6 +49,47 @@ public class HMM {
 		readModelFromFile(fileName);
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof HMM)) return false;
+
+		HMM hmm = (HMM) o;
+
+		if (featureValueCount != hmm.featureValueCount) return false;
+		if (gramCount != hmm.gramCount) return false;
+		//if (!corpus.equals(hmm.corpus)) return false;
+		if (!tagSet.equals(hmm.tagSet)) return false;
+
+		for (int fromTag = 0; fromTag < tagSet.size()+1; fromTag++) {
+			for (int toTag = 0; toTag < tagSet.size(); toTag++) {
+				if(transitionProbs[fromTag][toTag]!=hmm.transitionProbs[fromTag][toTag])
+					return false;
+			}
+		}
+
+		for (int tag = 0; tag < tagSet.size(); tag++) {
+			for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
+				for (int featureValue = 0; featureValue < featureValueCount; featureValue++) {
+					if(emissionProbs[tag][featureIndex][featureValue]!=hmm.emissionProbs[tag][featureIndex][featureValue])
+						return false;
+				}
+			}
+		}
+
+
+		return true;
+	}
+
+	/*@Override
+	public int hashCode() {
+		int result = corpus.hashCode();
+		result = 31 * result + gramCount;
+		result = 31 * result + tagSet.hashCode();
+		result = 31 * result + featureValueCount;
+		return result;
+	} */
+
 	public Corpus getCorpus() {
 		return corpus;
 	}
@@ -264,11 +305,11 @@ public class HMM {
 		System.out.println("sentences: " + corpus.size());
 		Corpus taggedCorpus = new Corpus(tagSet/* corpus.getFeatureExtractor()*/);
 		for (int i = 0; i < corpus.size(); i++) {
-			System.out.print(i + ": ");
+			//System.out.print(i + ": ");
 			Sentence sentence = corpus.getSentence(i);
 			Sentence taggedSentence = new Sentence(sentence.getWords(), tagSentence(sentence), tagSet);
 			taggedCorpus.addSentence(taggedSentence);
-			System.out.println(taggedSentence);
+			//System.out.println(taggedSentence);
 			//if(i>10)
 			//	break;
 		}

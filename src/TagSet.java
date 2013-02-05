@@ -9,7 +9,7 @@ public class TagSet {
 	public static final int tagBound = 128;
 	public static final int tagBoundBitCount = 8;
 
-	//TODO: tagListe fuellen!
+
 
 	/**
 	 * tagMap contains a mapping from tag strings to byte indices (Attention: 1 .. (tagBound-1))
@@ -19,6 +19,23 @@ public class TagSet {
 	public int size() {
 		return tagMap.size();
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof TagSet)) return false;
+
+		TagSet tagSet = (TagSet) o;
+
+		if (!tagMap.equals(tagSet.tagMap)) return false;
+
+		return true;
+	}
+
+	/*@Override
+	public int hashCode() {
+		return tagMap.hashCode();
+	} */
 
 	/**
 	 * @param tagString have to be structured like "tagA/tagB/tagC/" don't forget the last slash!

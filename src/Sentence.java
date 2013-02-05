@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +15,27 @@ public class Sentence {
 	private int length;
 	private TagSet tagSet;
 	private FeatureVector[] features;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Sentence)) return false;
+
+		Sentence sentence = (Sentence) o;
+
+		if (length != sentence.length) return false;
+		if (!tagSet.equals(sentence.tagSet)) return false;
+		if (!Arrays.equals(tags, sentence.tags)) return false;
+		if (!Arrays.equals(words, sentence.words)) return false;
+
+		for (int i = 0; i < length; i++) {
+			if(!words[i].equals(sentence.words[i])) return false;
+			if(tags[i]!=sentence.tags[i]) return false;
+		}
+
+		return true;
+	}
+
 
 	public int length() {
 		return length;
