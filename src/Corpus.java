@@ -1,8 +1,4 @@
-import com.sun.corba.se.spi.orb.StringPair;
-
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,38 +15,67 @@ public class Corpus {
 	 * - content partition: [partitionCount] Lists of sentences
 	 * - partitionCount: count of partitions the List of sentences is split to
 	 */
-	private List<Sentence> content;
-	private List<Sentence>[] partition;
+	//private List<Sentence> content;
+	//private List<Sentence>[] partition;
+	private Sentence[] contentArray;
+	private Sentence[][] partitionArray;
+	int sizeContent;
+	int sizePartition;
 	private TagSet tagSet;
 	//private FeatureExtractor featureExtractor;
 
 	///////// Methods ////////////
 
 	Corpus(TagSet tagSet/*, FeatureExtractor featureExtractor*/) {
-		content = new ArrayList<Sentence>();
+		//content = new ArrayList<Sentence>();
+		contentArray = new Sentence[60000];
+		sizeContent = 0;
+		sizePartition = 0;
 		this.tagSet = tagSet;
 		//this.featureExtractor = featureExtractor;
 	}
 
+	public Sentence[] getContent() {
+		return contentArray;
+	}
+	/*
 	public List<Sentence> getContent() {
 		return content;
-	}
+	} */
 
 	public Sentence getSentence(int index){
-		return content.get(index);
+		return contentArray[index];
 	}
+
+	/*
+	public Sentence getSentence(int index){
+		return content.get(index);
+	}*/
 
 	public void setSentence(Sentence sentence, int index){
-		content.set(index,sentence);
+		contentArray[index]= sentence;
 	}
+	/*
+	public void setSentence(Sentence sentence, int index){
+		content.set(index,sentence);
+	} */
 
 	public void addSentence(Sentence sentence){
+		setSentence(sentence, sizeContent);
+		sizeContent++;
+	}
+	/*
+	public void addSentence(Sentence sentence){
 		content.add(sentence);
-	};
+	};*/
 
 	public int size(){
-		return content.size();
+		return sizeContent;
 	}
+	/*
+	public int size(){
+		return content.size();
+	} */
 
 	public TagSet getTagSet() {
 		return tagSet;
@@ -79,7 +104,8 @@ public class Corpus {
 			//Read File Line By Line
 			while ((strLine = br.readLine()) != null) {
 				if (strLine.length() > 0) {
-					content.add(new Sentence(strLine, tagSet, featureExtractor));
+					addSentence(new Sentence(strLine, tagSet, featureExtractor));
+					//content.add(new Sentence(strLine, tagSet, featureExtractor));
 				}
 			}
 			//Close the input stream
@@ -92,14 +118,21 @@ public class Corpus {
 
 	public void constructPartition(int partitionCount) {
 		//this.partitionCount = partitionCount;
-		partition = (ArrayList<Sentence>[]) new ArrayList[partitionCount];
-		for (int i = 0; i < partitionCount; i++) {
-			partition[i] = new ArrayList<Sentence>(content.size() / partitionCount + 1);
-		}
-		int i = 0;
-		for (Sentence sentence : content) {
-			partition[i % partitionCount].add(sentence);
-			i++;
+		partitionArray = new Sentence[partitionCount][60000 / partitionCount];
+		//partition = (ArrayList<Sentence>[]) new ArrayList[partitionCount];
+		//for (int i = 0; i < partitionCount; i++) {
+			//partition[i] = new ArrayList<Sentence>(content.size() / partitionCount + 1);
+
+		int j = 0;
+		//for (Sentence sentence : content) {
+		//	partition[j % partitionCount].add(sentence);
+		//	j++;
+		//}
+		for (int i = 0; i < sizeContent; i++) {
+			partitionArray[j % partitionCount][sizePartition] = contentArray[j];
+			j++;
+			if (j % partitionCount == 0)
+				sizePartition++;
 		}
 	}
 
@@ -114,18 +147,26 @@ public class Corpus {
 		}
 	} */
 
-	public Corpus getTrainCorpus(int excludeIndex){
+	public Corpus getTrainCorpus(int excludeIndex, int partitionCount){
 		Corpus result = new Corpus(tagSet);
-		for (int i = 0; i < partition.length; i++) {
+		/*for (int i = 0; i < partition.length; i++) {
 			if (i != excludeIndex)
 				result.content.addAll(partition[i]);
+		} */
+		for (int i = 0; i < partitionCount; i++)
+		{
+			if (i != excludeIndex)
+				for (int j = 0; j < sizePartition; j++)
+					result.addSentence(partitionArray[i][j]);
 		}
 		return result;
 	}
 
 	public Corpus getEvaluationCorpus(int index){
 		Corpus result = new Corpus(tagSet);
-		result.content.addAll(partition[index]);
+		//result.content.addAll(partition[index]);
+		for (int j = 0; j < sizePartition; j++)
+			result.addSentence(partitionArray[index][j]);
 		return result;
 	}
 
@@ -139,9 +180,17 @@ public class Corpus {
 		    FileWriter fstream = new FileWriter(fileName);
 		    BufferedWriter out = new BufferedWriter(fstream);
 
-			for (Sentence sentence : content) {
+			//int i = 0;
+			/*for (Sentence sentence : content) {
+				i++;
 				out.write("\n\n\n");
 				out.write(sentence.toString());
+				System.out.println(fileName + " Schreibe Satz: " + i);
+			} */
+			for (int i = 0; i < sizeContent; i++) {
+				out.write("\n\n\n");
+				out.write(contentArray[i].toString());
+				//System.out.println(fileName + " Schreibe Satz: " + i);
 			}
 
 			//Close the output stream

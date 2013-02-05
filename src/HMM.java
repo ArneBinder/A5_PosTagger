@@ -1,13 +1,7 @@
 import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 
 import java.io.*;
-import java.nio.CharBuffer;
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -110,7 +104,9 @@ public class HMM {
 		//FeatureExtractor featureExtractor = new FeatureExtractor();
 		int curSenIndex = 0;
 		long time = System.currentTimeMillis();
-		for (Sentence sentence : corpus.getContent()) {
+
+		for (int k = 0; k < corpus.size(); k++) {
+		//for (Sentence sentence : corpus.getContent()) {
 			tagGram = 0;
 			//System.out.print(".");
 			if (curSenIndex % 1000 == 0 && curSenIndex > 0) {
@@ -120,12 +116,14 @@ public class HMM {
 			}
 			String currentTransition = "";
 			String currentTagGram = "";
-			for (int i = 0; i < sentence.length(); i++) {
+
+			Sentence actSentence = corpus.getSentence(k);
+			for (int i = 0; i < actSentence.length(); i++) {
 				allTransitionCount++;  //STATS
 				currentTagGram = tagSet.tagGramToString(tagGram);
 				totalTransitions.add(tagGram);
 				tagGram <<= TagSet.tagBoundBitCount;
-				currentTag = sentence.getTag(i);
+				currentTag = actSentence.getTag(i);
 				tagGram += currentTag + 1;
 				currentTransition = tagSet.tagGramToString(tagGram);
 				transitionCounts.add(tagGram);
@@ -141,7 +139,7 @@ public class HMM {
 				// Features des aktuellen Wortes extrahieren & (gramTag --> Features) zaehlen
 
 				//FeatureVector featureVector = featureExtractor.getFeatures(sentence, i);
-				FeatureVector featureVector = sentence.getFeature(i);
+				FeatureVector featureVector = actSentence.getFeature(i);
 
 				for (int j = 0; j < FeatureExtractor.featureSize; j++) {
 					//TODO: check, if Pair works correct

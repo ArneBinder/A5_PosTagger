@@ -59,7 +59,7 @@ public class TestCorpus {
 
 		System.out.println("construct partition...");
 		corpus.constructPartition(10);
-		Corpus trainCorpus = corpus.getTrainCorpus(9);
+		Corpus trainCorpus = corpus.getTrainCorpus(9, 10);
 		System.out.println("start training...");
 		HMM hmm = new HMM(trainCorpus, tagSet, featureValueCount);
 		System.out.println("HMM initialized.");
