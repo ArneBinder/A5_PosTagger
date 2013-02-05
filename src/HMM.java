@@ -224,17 +224,17 @@ public class HMM {
 		System.out.println("normalize transitionProbs...");
 		/* transitionCounts by totalTransitions */
 		//transitionProbs = new HashMap<Long, Double>();
-		transitionProbs = new double[tagSet.size()+1][tagSet.size()];
+		transitionProbs = new double[tagSet.size() + 1][tagSet.size()];
 		for (Multiset.Entry<Integer> entry : transitionCounts.entrySet()) {
 			// reconstruct source prevTag
 			int transition = entry.getElement();
 			int prevTag = (transition >> TagSet.tagBoundBitCount);
-			int tag = (transition & 0xFF) -1;
+			int tag = (transition & 0xFF) - 1;
 			//String currentPosGram = tagSet.tagGramToString(prevTag);
 			//String currentTransition = tagSet.tagGramToString(entry.getElement());
 			//System.out.println(currentTransition+"\t"+entry.getCount()+"("+currentPosGram+": "+totalTransitions.count(prevTag)+")");
 			double logProb = Math.log(entry.getCount()) - Math.log(totalTransitions.count(prevTag));
-			if(tag < 0)
+			if (tag < 0)
 				System.out.println(tag);
 			if (logProb > Helper.smoothing)
 				// --> array aus fromPosTagGram, toPosTagGram, logProb
@@ -288,22 +288,22 @@ public class HMM {
 		}
 
 		//byte[] bestTags = new byte[sentence.length()];
-		int tagGramCoded = 0;//0x100L;
+		//int tagGramCoded = 0;//0x100L;
 
 		// for all words do...
 		for (int currentWordIndex = 0; currentWordIndex < sentence.length(); currentWordIndex++) {
 			String word = sentence.getWord(currentWordIndex);
 			//FeatureVector featureVector = featureExtractor.getFeatures(sentence, currentWordIndex);
 			FeatureVector featureVector = sentence.getFeature(currentWordIndex);
-			tagGramCoded &= 0xFFFFFFFFFFFFFF00L;
+			//tagGramCoded &= 0xFFFFFFFFFFFFFF00L;
 			for (byte currentTagIndex = 0; currentTagIndex < tagSet.size(); currentTagIndex++) {
 				double maxProb = -Double.MAX_VALUE;
 
 				//System.out.println(maxProb);
-				tagGramCoded++;
+				/*tagGramCoded++;
 				String tagGramStr = tagSet.tagGramToString(tagGramCoded >> TagSet.tagBoundBitCount);
 				String lastTag = "";
-				String tagGramTrans = tagSet.tagGramToString(tagGramCoded);
+				String tagGramTrans = tagSet.tagGramToString(tagGramCoded);  */
 				// for all possible tagGrams (sources) do...
 				/*for (byte prevTagIndex7 = 0; prevTagIndex7 < tagSet.size(); prevTagIndex7++) {
 					tagGramCoded &= 0xFF000000000000FFL;
@@ -325,32 +325,32 @@ public class HMM {
 									tagGramCoded &= 0xFFFFFFFFFF0000FFL;
 									if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 3)
 										tagGramCoded += 0x1000000L;*/
-				for (byte prevTagIndex2 = 0; prevTagIndex2 < tagSet.size(); prevTagIndex2++) {
+				/*for (byte prevTagIndex2 = 0; prevTagIndex2 < tagSet.size(); prevTagIndex2++) {
 					tagGramCoded &= 0xFFFF00FF;
 					if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 2)
-						tagGramCoded += 0x10000;
-					for (byte prevTagIndex1 = 0; prevTagIndex1 < tagSet.size(); prevTagIndex1++) {
-						if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 1)
+						tagGramCoded += 0x10000; */
+				for (byte prevTagIndex1 = 0; prevTagIndex1 < tagSet.size(); prevTagIndex1++) {
+						/*if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 1)
 							tagGramCoded += 0x100;
 						lastTag = tagSet.tagToString(prevTagIndex1);
 						tagGramStr = tagSet.tagGramToString(tagGramCoded >> TagSet.tagBoundBitCount);
 						//for all current possible tags (target) do...
 						//System.out.println(getTransitionProb(tagGramCoded));
-						tagGramTrans = tagSet.tagGramToString(tagGramCoded);
-						double transitionProb = transitionProbs[prevTagIndex1+1][currentTagIndex];//getTransitionProb(tagGramCoded);
-						double currentPathProb = pathProbs[currentWordIndex][prevTagIndex1];
-						double currentProb = currentPathProb + transitionProb;
-						if (currentProb >= maxProb) {
-							//System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentPathProb+" max: "+maxProb);
-							maxProb = currentProb;
-							//System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentPathProb+" max: "+maxProb);
-							sourceTags[currentWordIndex][currentTagIndex] = prevTagIndex1;
-						}
-						//tagGramCoded += 0x100L;
-						tagGramStr = tagSet.tagGramToString(tagGramCoded >> TagSet.tagBoundBitCount);
-						if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 1)
-							break;
+						tagGramTrans = tagSet.tagGramToString(tagGramCoded); */
+					double transitionProb = transitionProbs[prevTagIndex1 + 1][currentTagIndex];//getTransitionProb(tagGramCoded);
+					double currentPathProb = pathProbs[currentWordIndex][prevTagIndex1];
+					double currentProb = currentPathProb + transitionProb;
+					if (currentProb >= maxProb) {
+						//System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentPathProb+" max: "+maxProb);
+						maxProb = currentProb;
+						//System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentPathProb+" max: "+maxProb);
+						sourceTags[currentWordIndex][currentTagIndex] = prevTagIndex1;
 					}
+					//tagGramCoded += 0x100L;
+						/*tagGramStr = tagSet.tagGramToString(tagGramCoded >> TagSet.tagBoundBitCount);
+						if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 1)
+							break;            */
+		/*			}
 
 					if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 2)
 						break;
@@ -358,7 +358,7 @@ public class HMM {
 
 					//tagGramCoded += 0x10100L;
 				}
-/*
+
 									if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 3)
 										break;
 									//System.out.println("asdasd");
@@ -385,7 +385,8 @@ public class HMM {
 
 					//tagGramCoded += 0x101010101010100L;
 				}   */
-				//System.out.println(maxProb);
+					//System.out.println(maxProb);
+				}
 				double emitProb = getEmitProb(currentTagIndex, featureVector);
 				pathProbs[currentWordIndex + 1][currentTagIndex] = maxProb + emitProb;
 
@@ -507,8 +508,8 @@ public class HMM {
 			// read transitionProbs
 			//int transitionHashMapSize = inputStream.readInt();
 			//transitionProbs = new HashMap<Long, Double>(transitionHashMapSize);
-			transitionProbs = new double[tagSet.size()+1][tagSet.size()];
-			for (int transitionFromValue = 0; transitionFromValue < tagSet.size()+1; transitionFromValue++) {
+			transitionProbs = new double[tagSet.size() + 1][tagSet.size()];
+			for (int transitionFromValue = 0; transitionFromValue < tagSet.size() + 1; transitionFromValue++) {
 				//int mask = transitionFromValue << TagSet.tagBoundBitCount;
 				for (int transitionToValue = 0; transitionToValue < tagSet.size(); transitionToValue++) {
 					double value = inputStream.readDouble();
@@ -590,7 +591,7 @@ public class HMM {
 			//outputStream.writeInt(transitionProbs.size());
 			//for (Map.Entry<Long, Double> entry : transitionProbs.entrySet()) {
 			//System.out.println(transitionProbs.length+" x "+transitionProbs[0].length);
-			for (int transitionFromValue = 0; transitionFromValue < tagSet.size()+1; transitionFromValue++) {
+			for (int transitionFromValue = 0; transitionFromValue < tagSet.size() + 1; transitionFromValue++) {
 				//int mask = transitionFromValue << TagSet.tagBoundBitCount;
 				for (int transitionToValue = 0; transitionToValue < tagSet.size(); transitionToValue++) {
 					//System.out.println(transitionFromValue+" x "+transitionToValue);

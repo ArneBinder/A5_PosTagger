@@ -19,9 +19,9 @@ public class TestCorpus {
 			//System.out.println(brown_learn);
 			System.out.println(i+":\t"+corpus.size()+"\t"+featureExtractor.getFeatureValues().size());
 			corpus.addContentFromFile(directoryName + "\\" + fileName, featureExtractor);
-			if (corpus.size() > 120)
-				break;
-			if (i > 10)
+			//if (corpus.size() > 120)
+			//	break;
+			if (i > 100)
 			 	break;
 			i++;
 		}
@@ -117,10 +117,12 @@ public class TestCorpus {
 		//HMM hmm = new HMM("model");
 		//evalCorpus.writeContentToFile("evalCorpus");
 		hmm.setCorpus(evalCorpus);
+		long timeStartTagging = System.currentTimeMillis();
 		Corpus taggedCorpus = hmm.tag();
 		taggedCorpus.writeContentToFile("taggedCorpus");
 		Evaluator evaluator = new Evaluator();
 		System.out.println("FMeasure: "+evaluator.getSimpleFMeasure(evalCorpus, taggedCorpus));
+		System.out.println("tagged in "+(System.currentTimeMillis()-timeStartTagging)+"ms");
 
 
 		//hmm.printEmissionProbs(4);
