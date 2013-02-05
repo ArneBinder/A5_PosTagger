@@ -82,6 +82,7 @@ public class TestCorpus {
 			FeatureExtractor featureExtractor2 = new FeatureExtractor();
 			FeatureExtractor featureExtractor3 = new FeatureExtractor();
 			//Corpus trainCorpus = corpus.getTrainCorpus(9);
+
 			Corpus evalCorpus = new Corpus(tagSet);
 			evalCorpus.addContentFromFile("evalCorpus"+i, featureExtractor2);
 			Corpus taggedCorpus = new Corpus(tagSet);
