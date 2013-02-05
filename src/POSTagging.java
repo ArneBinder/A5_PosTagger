@@ -25,12 +25,13 @@ public class POSTagging {
 			for (String fileName : Helper.getFileList(directory_name)) {
 				corpus.addContentFromFile(directory_name+File.separator + fileName, featureExtractor);
 			}
+			int featureValueCount = featureExtractor.getFeatureValueCount();
 			featureExtractor.writeFeatureValuesToFile(featureValuesFile, true);
 			long corpusCreated = System.currentTimeMillis();
 			System.out.println("corpus created in " + (corpusCreated - startTime) + "ms");
 			System.out.println("total size: " + corpus.size() + " sentences.");
 
-			HMM hmm = new HMM(corpus, 1, tagSet);
+			HMM hmm = new HMM(corpus, tagSet, featureValueCount);
 			System.out.println("HMM initialized.");
 			System.out.println("start training...");
 			hmm.train();

@@ -44,6 +44,10 @@ public class FeatureExtractor {
 
 	}
 
+	public int getFeatureValueCount(){
+		return featureValues.size();
+	}
+
 	public HashMap<String, Integer> getFeatureValues() {
 		return featureValues;
 	}

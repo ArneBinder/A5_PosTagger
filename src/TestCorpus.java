@@ -10,7 +10,7 @@ public class TestCorpus {
 		long startTime = System.currentTimeMillis();
 		final String directoryName = "brown_learn";
 		TagSet tagSet = new TagSet("");
-		/*FeatureExtractor featureExtractor = new FeatureExtractor();
+		FeatureExtractor featureExtractor = new FeatureExtractor();
 		Corpus corpus = new Corpus(tagSet);
 
 		int i = 0;
@@ -19,9 +19,9 @@ public class TestCorpus {
 			//System.out.println(brown_learn);
 			System.out.println(i+":\t"+corpus.size()+"\t"+featureExtractor.getFeatureValues().size());
 			corpus.addContentFromFile(directoryName + "\\" + fileName, featureExtractor);
-			if (corpus.size() > 45000)
+			if (corpus.size() > 120)
 				break;
-			if (i > 300)
+			if (i > 10)
 			 	break;
 			i++;
 		}
@@ -30,12 +30,13 @@ public class TestCorpus {
 		//for (int j = 0; j < FeatureExtractor.featureSize; j++) {
 		//	System.out.println(featureExtractor.getFeatureValues(j).size());
 		//}
+		int featureValueCount = featureExtractor.getFeatureValueCount();
 		System.out.println("write featureValues to file...");
 		featureExtractor.writeFeatureValuesToFile("featureValues", true);
 		//featureExtractor.resetFeatureValues();
 		System.out.println("done.");
 		long corpusCreated = System.currentTimeMillis();
-          */
+
 		/*
 		FeatureExtractor f2 = new FeatureExtractor("featureValues");
 		//for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
@@ -49,15 +50,18 @@ public class TestCorpus {
 		//}
         */
 
-		/*
+
 		System.out.println("corpus created after " + (corpusCreated - startTime) + "ms");
 		System.out.println("total size: " + corpus.size() + " sentences.");
 		//corpus.writeContentToFile("outTest");
 		System.out.println("tagSet.size(): "+tagSet.size());
 		System.out.println(tagSet);
 
+		System.out.println("construct partition...");
+		corpus.constructPartition(10);
+		Corpus trainCorpus = corpus.getTrainCorpus(9);
 		System.out.println("start training...");
-		HMM hmm = new HMM(corpus, 1, tagSet);
+		HMM hmm = new HMM(trainCorpus, tagSet, featureValueCount);
 		System.out.println("HMM initialized.");
 		//System.out.println(corpus.t);
 		//System.out.println("blub");
@@ -69,15 +73,15 @@ public class TestCorpus {
 		//TagSet t = new TagSet(tagSet.toString());
 		//System.out.println(t);
 
-         */
+
 		//System.out.println(tagSet);
 		//TagSet tagSet1 = new TagSet(tagSet.toString());
 		//System.out.println(tagSet1);
 
 
-		//System.out.println("construct partition...");
-		//corpus.constructPartition(10);
-		for (int i = 0; i < 10; i++) {
+
+
+		/*for (int i = 0; i < 10; i++) {
 
 			FeatureExtractor featureExtractor2 = new FeatureExtractor();
 			FeatureExtractor featureExtractor3 = new FeatureExtractor();
@@ -90,7 +94,7 @@ public class TestCorpus {
 
 			Evaluator evaluator = new Evaluator();
 			System.out.println("FMeasure: "+evaluator.getSimpleFMeasure(evalCorpus, taggedCorpus));
-		}
+		}  */
 
 		/*
 		System.out.println("start training...");
@@ -106,16 +110,18 @@ public class TestCorpus {
 		//hmm.printTransitionProbs();
 		System.out.println();
         */
-		                                                               /*
+
+
+		Corpus evalCorpus = corpus.getEvaluationCorpus(9);
 		System.out.println("read model from file...");
-		HMM hmm = new HMM("model");
-		evalCorpus.writeContentToFile("evalCorpus");
+		//HMM hmm = new HMM("model");
+		//evalCorpus.writeContentToFile("evalCorpus");
 		hmm.setCorpus(evalCorpus);
 		Corpus taggedCorpus = hmm.tag();
 		taggedCorpus.writeContentToFile("taggedCorpus");
 		Evaluator evaluator = new Evaluator();
 		System.out.println("FMeasure: "+evaluator.getSimpleFMeasure(evalCorpus, taggedCorpus));
-		                                                                  */
+
 
 		//hmm.printEmissionProbs(4);
 		/*System.out.println("start tagging...");

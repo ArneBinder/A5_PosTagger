@@ -24,25 +24,30 @@ public class HMM {
 	 * - emissionProbs
 	 */
 	// prevGramPosTag<<8+posTag --> probability
-	HashMap<Long, Double> transitionProbs;
+	//HashMap<Long, Double> transitionProbs;
+	double[][] transitionProbs;
+
 	// pos-tag x feature-index x feature-value --> probability
-	HashMap<Integer, Double>[][] emissionProbs;
+	//HashMap<Integer, Double>[][] emissionProbs;
+	double[][][] emissionProbs;
 
 
 	private Corpus corpus;
 	private int gramCount;
 	private TagSet tagSet;
+	private int featureValueCount;
 
 
 	//////// Methods ///////////
 
-	HMM(Corpus corpus, int gramCount, TagSet tagSet) {
+	HMM(Corpus corpus, /*int gramCount,*/ TagSet tagSet, int featureValueCount) {
 		//System.out.println(gramCount);
 		//System.out.println(Helper.maxGramCount);
 		assert gramCount <= Helper.maxGramCount : "given gram count = " + gramCount + " is bigger than max gram count = " + Helper.maxGramCount + ".";
 		this.corpus = corpus;
-		this.gramCount = gramCount;
+		this.gramCount = 1;
 		this.tagSet = tagSet;
+		this.featureValueCount = featureValueCount;
 
 	}
 
@@ -62,13 +67,13 @@ public class HMM {
 		return tagSet;
 	}
 
-	public void printTransitionProbs() {
+	/*public void printTransitionProbs() {
 		System.out.println("transitionProbs(" + transitionProbs.size() + "):");
 		for (Map.Entry<Long, Double> entry : transitionProbs.entrySet()) {
 			long key = entry.getKey();
 			System.out.println(tagSet.tagGramToString(key >> TagSet.tagBoundBitCount) + "\t--> " + tagSet.tagToString((byte) ((key & 0xFF) - 1)) + ": \t" + Math.exp(entry.getValue()));
 		}
-	}
+	} */
 
 	/*public void printEmissionProbs(int featureIndex) {
 		System.out.println("emissionProbs:");
@@ -82,9 +87,10 @@ public class HMM {
 	} */
 
 	public void train() {
+		System.out.println(featureValueCount);
 		//System.out.println("corpus.size(): " + corpus.size());
-		Multiset<Long> transitionCounts = HashMultiset.create();
-		Multiset<Long> totalTransitions = HashMultiset.create();
+		Multiset<Integer> transitionCounts = HashMultiset.create();
+		Multiset<Integer> totalTransitions = HashMultiset.create();
 		Multiset<Integer>[][] emissionCounts = new Multiset[FeatureExtractor.featureSize][tagSet.size()]; // saves for every feature (-->Array) how often a posGram(Long) emits a specific value (String)
 		Multiset<Byte> totalEmissions = HashMultiset.create(); //saves how often a posGram occurs in total
 		int allTransitionCount; //STATS
@@ -95,7 +101,7 @@ public class HMM {
 
 		}
 		allTransitionCount = 0;
-		long tagGram;
+		int tagGram;
 		byte currentTag;
 		int[] lastSize = new int[FeatureExtractor.featureSize];
 		for (int i = 0; i < FeatureExtractor.featureSize; i++) {
@@ -173,10 +179,14 @@ public class HMM {
 		/* emissionCounts by totalEmissions */
 		// pos-tag x feature-index x feature-value --> probability
 		//int t = tagSet.size();
-		emissionProbs = new HashMap[tagSet.size()][FeatureExtractor.featureSize];
+		//emissionProbs = new HashMap[tagSet.size()][FeatureExtractor.featureSize];
+		emissionProbs = new double[tagSet.size()][FeatureExtractor.featureSize][featureValueCount];
 		for (int i = 0; i < tagSet.size(); i++) {
 			for (int j = 0; j < FeatureExtractor.featureSize; j++) {
-				emissionProbs[i][j] = new HashMap<Integer, Double>();
+				for (int k = 0; k < featureValueCount; k++) {
+					emissionProbs[i][j][k] = Helper.smoothing;
+				}
+				//emissionProbs[i][j] = new HashMap<Integer, Double>();
 			}
 		}
 		System.out.println("normalize emissionProbs...");
@@ -197,7 +207,8 @@ public class HMM {
 					//if (logProb != 1d / 0)
 					//	System.out.println("no INf " + logProb);
 					if (logProb > Helper.smoothing)
-						emissionProbs[tagIndex][featureIndex].put(entry.getElement(), logProb);
+						emissionProbs[tagIndex][featureIndex][entry.getElement()] = logProb;
+					//emissionProbs[tagIndex][featureIndex].put(entry.getElement(), logProb);
 					//if(emissionCounts[featureIndex].remove(entry.getElement(), entryCount)>0)
 					//	System.out.println("removed");
 					// --> array aus posTagGram, featureIndex, featureValue, logProb
@@ -212,17 +223,23 @@ public class HMM {
 		System.out.println("emissionProbs done.");
 		System.out.println("normalize transitionProbs...");
 		/* transitionCounts by totalTransitions */
-		transitionProbs = new HashMap<Long, Double>();
-		for (Multiset.Entry<Long> entry : transitionCounts.entrySet()) {
-			// reconstruct source posGram
-			Long posGram = (entry.getElement() >> TagSet.tagBoundBitCount);
-			String currentPosGram = tagSet.tagGramToString(posGram);
-			String currentTransition = tagSet.tagGramToString(entry.getElement());
-			//System.out.println(currentTransition+"\t"+entry.getCount()+"("+currentPosGram+": "+totalTransitions.count(posGram)+")");
-			double logProb = Math.log(entry.getCount()) - Math.log(totalTransitions.count(posGram));
+		//transitionProbs = new HashMap<Long, Double>();
+		transitionProbs = new double[tagSet.size()+1][tagSet.size()];
+		for (Multiset.Entry<Integer> entry : transitionCounts.entrySet()) {
+			// reconstruct source prevTag
+			int transition = entry.getElement();
+			int prevTag = (transition >> TagSet.tagBoundBitCount);
+			int tag = (transition & 0xFF) -1;
+			//String currentPosGram = tagSet.tagGramToString(prevTag);
+			//String currentTransition = tagSet.tagGramToString(entry.getElement());
+			//System.out.println(currentTransition+"\t"+entry.getCount()+"("+currentPosGram+": "+totalTransitions.count(prevTag)+")");
+			double logProb = Math.log(entry.getCount()) - Math.log(totalTransitions.count(prevTag));
+			if(tag < 0)
+				System.out.println(tag);
 			if (logProb > Helper.smoothing)
 				// --> array aus fromPosTagGram, toPosTagGram, logProb
-				transitionProbs.put(entry.getElement(), logProb);
+				transitionProbs[prevTag][tag] = logProb;
+			//transitionProbs.put(entry.getElement(), logProb);
 
 		}
 		System.out.println("transitionProbs done.");
@@ -251,7 +268,7 @@ public class HMM {
 		for (int i = 0; i < corpus.size(); i++) {
 			System.out.print(i + ": ");
 			Sentence sentence = corpus.getSentence(i);
-			Sentence taggedSentence = new Sentence(sentence.getWords(),tagSentence(sentence), tagSet);
+			Sentence taggedSentence = new Sentence(sentence.getWords(), tagSentence(sentence), tagSet);
 			taggedCorpus.addSentence(taggedSentence);
 			System.out.println(taggedSentence);
 			//if(i>10)
@@ -271,7 +288,7 @@ public class HMM {
 		}
 
 		//byte[] bestTags = new byte[sentence.length()];
-		long tagGramCoded = 0;//0x100L;
+		int tagGramCoded = 0;//0x100L;
 
 		// for all words do...
 		for (int currentWordIndex = 0; currentWordIndex < sentence.length(); currentWordIndex++) {
@@ -308,39 +325,39 @@ public class HMM {
 									tagGramCoded &= 0xFFFFFFFFFF0000FFL;
 									if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 3)
 										tagGramCoded += 0x1000000L;*/
-									for (byte prevTagIndex2 = 0; prevTagIndex2 < tagSet.size(); prevTagIndex2++) {
-										tagGramCoded &= 0xFFFFFFFFFFFF00FFL;
-										if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 2)
-											tagGramCoded += 0x10000L;
-										for (byte prevTagIndex1 = 0; prevTagIndex1 < tagSet.size(); prevTagIndex1++) {
-											if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 1)
-												tagGramCoded += 0x100L;
-											lastTag = tagSet.tagToString(prevTagIndex1);
-											tagGramStr = tagSet.tagGramToString(tagGramCoded >> TagSet.tagBoundBitCount);
-											//for all current possible tags (target) do...
-											//System.out.println(getTransitionProb(tagGramCoded));
-											tagGramTrans = tagSet.tagGramToString(tagGramCoded);
-											double transitionProb = getTransitionProb(tagGramCoded);
-											double currentPathProb = pathProbs[currentWordIndex][prevTagIndex1];
-											double currentProb = currentPathProb + transitionProb;
-											if (currentProb >= maxProb) {
-												//System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentPathProb+" max: "+maxProb);
-												maxProb = currentProb;
-												//System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentPathProb+" max: "+maxProb);
-												sourceTags[currentWordIndex][currentTagIndex] = prevTagIndex1;
-											}
-											//tagGramCoded += 0x100L;
-											tagGramStr = tagSet.tagGramToString(tagGramCoded >> TagSet.tagBoundBitCount);
-											if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 1)
-												break;
-										}
+				for (byte prevTagIndex2 = 0; prevTagIndex2 < tagSet.size(); prevTagIndex2++) {
+					tagGramCoded &= 0xFFFF00FF;
+					if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 2)
+						tagGramCoded += 0x10000;
+					for (byte prevTagIndex1 = 0; prevTagIndex1 < tagSet.size(); prevTagIndex1++) {
+						if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) >= 1)
+							tagGramCoded += 0x100;
+						lastTag = tagSet.tagToString(prevTagIndex1);
+						tagGramStr = tagSet.tagGramToString(tagGramCoded >> TagSet.tagBoundBitCount);
+						//for all current possible tags (target) do...
+						//System.out.println(getTransitionProb(tagGramCoded));
+						tagGramTrans = tagSet.tagGramToString(tagGramCoded);
+						double transitionProb = transitionProbs[prevTagIndex1+1][currentTagIndex];//getTransitionProb(tagGramCoded);
+						double currentPathProb = pathProbs[currentWordIndex][prevTagIndex1];
+						double currentProb = currentPathProb + transitionProb;
+						if (currentProb >= maxProb) {
+							//System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentPathProb+" max: "+maxProb);
+							maxProb = currentProb;
+							//System.out.println(word+"/"+tagSet.tagToString((byte)(prevTagIndex1+1))+": current: "+ currentPathProb+" max: "+maxProb);
+							sourceTags[currentWordIndex][currentTagIndex] = prevTagIndex1;
+						}
+						//tagGramCoded += 0x100L;
+						tagGramStr = tagSet.tagGramToString(tagGramCoded >> TagSet.tagBoundBitCount);
+						if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 1)
+							break;
+					}
 
-										if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 2)
-											break;
-										//System.out.println("asdasd");
+					if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 2)
+						break;
+					//System.out.println("asdasd");
 
-										//tagGramCoded += 0x10100L;
-									}
+					//tagGramCoded += 0x10100L;
+				}
 /*
 									if ((gramCount < currentWordIndex ? gramCount : currentWordIndex) < 3)
 										break;
@@ -378,8 +395,6 @@ public class HMM {
 		}
 
 
-
-
 		double resultProb = -Double.MAX_VALUE;
 		double currentProb;
 		byte lastTagIndex = 0;
@@ -415,24 +430,24 @@ public class HMM {
 		return resultTags;
 	}
 
-	private double getTransitionProb(long tags) {
+	/*private double getTransitionProb(long tags) {
 		try {
 			return transitionProbs.get(tags);
 		} catch (Exception e) {
 			return Helper.smoothing;
 		}
-	}
+	} */
 
 	private double getEmitProb(byte tag, FeatureVector featureVector) {
 		double resultProb = 0;
 		for (int i = 0; i < FeatureExtractor.featureSize; i++) {
 			// pos-tag x feature-index x feature-value --> probability
 			// TODO: implement weights!
-			try {
-				resultProb += emissionProbs[tag][i].get(featureVector.features[i]);
-			} catch (Exception e) {
-				resultProb += Helper.smoothing;
-			}
+			//try {
+			resultProb += emissionProbs[tag][i][featureVector.features[i]];
+			//} catch (Exception e) {
+			//	resultProb += Helper.smoothing;
+			//}
 		}
 		return resultProb;
 
@@ -455,6 +470,9 @@ public class HMM {
 			// read gramCount
 			gramCount = inputStream.readInt();
 
+			// read featureValueCount
+			featureValueCount = inputStream.readInt();
+
 			// read tagSet
 			int tagSetSize = inputStream.readInt();
 			char[] tags = new char[tagSetSize];
@@ -464,33 +482,40 @@ public class HMM {
 			tagSet = new TagSet(String.valueOf(tags));
 
 			// read emissionProbs
-			emissionProbs = new HashMap[tagSetSize][FeatureExtractor.featureSize];
+			//emissionProbs = new HashMap[tagSetSize][FeatureExtractor.featureSize];
+			emissionProbs = new double[tagSetSize][FeatureExtractor.featureSize][featureValueCount];
 			// pos-tag x feature-index x feature-value --> probability
 			for (int posTagIndex = 0; posTagIndex < tagSet.size(); posTagIndex++) {
 				for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
-					int listLength = inputStream.readInt();
-					emissionProbs[posTagIndex][featureIndex] = new HashMap<Integer, Double>(listLength);
-					for (int i = 0; i < listLength; i++) {
+					//int listLength = inputStream.readInt();
+					//emissionProbs[posTagIndex][featureIndex] = new HashMap<Integer, Double>(listLength);
+					for (int featureValue = 0; featureValue < featureValueCount; featureValue++) {
 
-						int featureValue = inputStream.readInt();
+						//int featureValue = inputStream.readInt();
 						/*int strLength = inputStream.readInt();
 						char[] chars = new char[strLength];
 						for (int j = 0; j < strLength; j++) {
 							chars[j] = inputStream.readChar();
 						} */
 						//emissionProbs[posTagIndex][featureIndex].put(String.valueOf(chars), inputStream.readDouble());
-						emissionProbs[posTagIndex][featureIndex].put(featureValue, inputStream.readDouble());
+						//emissionProbs[posTagIndex][featureIndex].put(featureValue, inputStream.readDouble());
+						emissionProbs[posTagIndex][featureIndex][featureValue] = inputStream.readDouble();
 					}
 				}
 			}
 
 			// read transitionProbs
-			int transitionHashMapSize = inputStream.readInt();
-			transitionProbs = new HashMap<Long, Double>(transitionHashMapSize);
-			for (int i = 0; i < transitionHashMapSize; i++) {
-				long key = inputStream.readLong();
-				double value = inputStream.readDouble();
-				transitionProbs.put(key, value);
+			//int transitionHashMapSize = inputStream.readInt();
+			//transitionProbs = new HashMap<Long, Double>(transitionHashMapSize);
+			transitionProbs = new double[tagSet.size()+1][tagSet.size()];
+			for (int transitionFromValue = 0; transitionFromValue < tagSet.size()+1; transitionFromValue++) {
+				//int mask = transitionFromValue << TagSet.tagBoundBitCount;
+				for (int transitionToValue = 0; transitionToValue < tagSet.size(); transitionToValue++) {
+					double value = inputStream.readDouble();
+					transitionProbs[transitionFromValue][transitionToValue] = value;
+				}
+				//int key = inputStream.readInt();
+
 			}
 
 			/*
@@ -525,6 +550,9 @@ public class HMM {
 			//write gramCount
 			outputStream.writeInt(gramCount);
 
+			// write featureValueCount
+			outputStream.writeInt(featureValueCount);
+
 			// write tagSet
 			char[] tagSetString = tagSet.toString().toCharArray();
 			outputStream.writeInt(tagSetString.length);
@@ -537,17 +565,21 @@ public class HMM {
 			for (int posTagIndex = 0; posTagIndex < tagSet.size(); posTagIndex++) {
 				for (int featureIndex = 0; featureIndex < FeatureExtractor.featureSize; featureIndex++) {
 					//ein Eintrag! vorher anzahl speichern
-					outputStream.writeInt((emissionProbs[posTagIndex][featureIndex].size()));
+					//outputStream.writeInt((emissionProbs[posTagIndex][featureIndex].size()));
 					//System.out.println(posTagIndex + "\t" + featureIndex + "\t" + emissionProbs[posTagIndex][featureIndex].size());
-					for (Map.Entry<Integer, Double> entry : emissionProbs[posTagIndex][featureIndex].entrySet()) {
+					//for (Map.Entry<Integer, Double> entry : emissionProbs[posTagIndex][featureIndex].entrySet()) {
+					for (int featureValue = 0; featureValue < featureValueCount; featureValue++) {
+
+
 						//char[] featureValue = entry.getKey().toCharArray();
-						int featureValue = entry.getKey();
+						//int featureValue = entry.getKey();
 						//outputStream.writeInt(featureValue.length);
-						outputStream.writeInt(featureValue);
+						//outputStream.writeInt(featureValue);
 						/*for (char c : featureValue) {
 							outputStream.writeChar(c);
 						} */
-						outputStream.writeDouble(entry.getValue());
+						//outputStream.writeDouble(entry.getValue());
+						outputStream.writeDouble(emissionProbs[posTagIndex][featureIndex][featureValue]);
 						//if (!entry.getValue().isInfinite())
 						//	System.out.println(posTagIndex + "\t" + featureIndex + "\t" + entry.getKey() + "\t" + entry.getValue());
 					}
@@ -555,10 +587,18 @@ public class HMM {
 			}
 
 			//write transitionProbs
-			outputStream.writeInt(transitionProbs.size());
-			for (Map.Entry<Long, Double> entry : transitionProbs.entrySet()) {
-				outputStream.writeLong(entry.getKey());
-				outputStream.writeDouble(entry.getValue());
+			//outputStream.writeInt(transitionProbs.size());
+			//for (Map.Entry<Long, Double> entry : transitionProbs.entrySet()) {
+			//System.out.println(transitionProbs.length+" x "+transitionProbs[0].length);
+			for (int transitionFromValue = 0; transitionFromValue < tagSet.size()+1; transitionFromValue++) {
+				//int mask = transitionFromValue << TagSet.tagBoundBitCount;
+				for (int transitionToValue = 0; transitionToValue < tagSet.size(); transitionToValue++) {
+					//System.out.println(transitionFromValue+" x "+transitionToValue);
+					outputStream.writeDouble(transitionProbs[transitionFromValue][transitionToValue]);
+				}
+				//outputStream.writeLong(entry.getKey());
+				//outputStream.writeDouble(entry.getValue());
+
 			}
 
 			/*

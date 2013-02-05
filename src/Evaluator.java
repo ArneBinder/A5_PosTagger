@@ -90,7 +90,8 @@ public class Evaluator {
 				break;
 			i++;
 		}
-
+		int featureValueCount = featureExtractor.getFeatureValueCount();
+		featureExtractor.resetFeatureValues();
 		long corpusCreated = System.currentTimeMillis();
 		System.out.println("corpus created after " + (corpusCreated - startTime) + "ms");
 		System.out.println("total size: " + corpus.size() + " sentences.");
@@ -106,7 +107,7 @@ public class Evaluator {
 			Corpus trainCorpus = corpus.getTrainCorpus(j);
 			Corpus evalCorpus = corpus.getEvaluationCorpus(j);
 
-			HMM hmm = new HMM(trainCorpus, 1, tagSet);
+			HMM hmm = new HMM(trainCorpus, tagSet, featureValueCount);
 			hmm.train();
 			evalCorpus.writeContentToFile("evalCorpus"+j);
 			System.out.println("HMM initialized.");
