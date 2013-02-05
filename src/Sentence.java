@@ -35,6 +35,17 @@ public class Sentence {
 		return features[i];
 	}
 
+	Sentence(String[] words, byte[] tags, TagSet tagSet){
+		this.tagSet = tagSet;
+		this.length = words.length;
+		this.words = new String[this.length];
+		this.tags = new byte[length];
+		System.arraycopy(tags,0,this.tags,0,length);
+		for (int i = 0; i < length; i++) {
+			this.words[i] = words[i];
+		}
+	}
+
 	Sentence(String sentence, TagSet tagSet, FeatureExtractor featureExtractor) {
 		this.tagSet = tagSet;
 		sentence = sentence.trim();
