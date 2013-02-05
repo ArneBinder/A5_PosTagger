@@ -42,13 +42,17 @@ public class POSTagging {
 			System.out.println("done.");
 		}else if(args[0].equals("annotate")){
 			System.out.println("read model from file \""+modelName+"\"...");
-			FeatureExtractor featureExtractor = new FeatureExtractor(featureValuesFile);
 			HMM hmm = new HMM(modelName);
-
-			System.out.println(hmm.getTagSet());
+			System.out.println("read featureValueIndex from file \""+featureValuesFile+"\"...");
+			FeatureExtractor featureExtractor = new FeatureExtractor(featureValuesFile);
+			long timeModelRead = System.currentTimeMillis();
+			System.out.println("done in "+(timeModelRead-startTime)+"ms");
+			//System.out.println(hmm.getTagSet());
 			//hmm.printEmissionProbs(0);
 			//hmm.printTransitionProbs();
+			int i = 0;
 			for (String fileName : Helper.getFileList(directory_name)) {
+				System.out.println(i+": ");
 				Corpus corpus = new Corpus(hmm.getTagSet());
 				System.out.println("read sentences from file \""+directory_name+File.separator+fileName+"\"...");
 				corpus.addContentFromFile(directory_name + File.separator + fileName, featureExtractor);
@@ -59,8 +63,10 @@ public class POSTagging {
 				System.out.println("FMeasure: "+evaluator.getFMeasure(corpus, taggedCorpus));
 				taggedCorpus.writeContentToFile(directory_name + File.separator + fileName+".pos");
 				System.out.println("output written to \""+directory_name + File.separator + fileName+".pos");
+				i++;
 			}
-			System.out.println("done.");
+			System.out.println("tagging done in "+(System.currentTimeMillis() - timeModelRead));
+			System.out.println("total time "+(System.currentTimeMillis() - startTime));
 		} else
 			System.out.println("wrong arguments. [learn|annotate] <directory_name>");
 	}
