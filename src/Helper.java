@@ -36,12 +36,11 @@ public class Helper {
 
 	public static String[] getFileList(String directoryPath) {
 		File dir = new File(directoryPath);
-		String[] fileList = dir.list(new FilenameFilter() {
+		return  dir.list(/*new FilenameFilter() {
 			public boolean accept(File d, String name) {
 				return !name.toLowerCase().contains(".pos");
 			}
-		});
-		return fileList;
+		}*/);
 	}
 
 	/*public static int ipow(int base, int exp)
