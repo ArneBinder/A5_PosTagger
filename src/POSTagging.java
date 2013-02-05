@@ -1,3 +1,5 @@
+import java.io.File;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Arne
@@ -21,7 +23,7 @@ public class POSTagging {
 			FeatureExtractor featureExtractor = new FeatureExtractor();
 			Corpus corpus = new Corpus(tagSet);
 			for (String fileName : Helper.getFileList(directory_name)) {
-				corpus.addContentFromFile(directory_name+"\\" + fileName, featureExtractor);
+				corpus.addContentFromFile(directory_name+File.separator + fileName, featureExtractor);
 			}
 			featureExtractor.writeFeatureValuesToFile(featureValuesFile, true);
 			long corpusCreated = System.currentTimeMillis();
@@ -47,15 +49,15 @@ public class POSTagging {
 			//hmm.printTransitionProbs();
 			for (String fileName : Helper.getFileList(directory_name)) {
 				Corpus corpus = new Corpus(hmm.getTagSet());
-				System.out.println("read sentences from file \""+directory_name+"\\"+fileName+"\"...");
-				corpus.addContentFromFile(directory_name + "\\" + fileName, featureExtractor);
+				System.out.println("read sentences from file \""+directory_name+File.separator+fileName+"\"...");
+				corpus.addContentFromFile(directory_name + File.separator + fileName, featureExtractor);
 				hmm.setCorpus(corpus);
 				System.out.println("tag sentences...");
 				Corpus taggedCorpus = hmm.tag();
 				Evaluator evaluator = new Evaluator();
 				System.out.println("FMeasure: "+evaluator.getFMeasure(corpus, taggedCorpus));
-				taggedCorpus.writeContentToFile(directory_name + "\\" + fileName+".pos");
-				System.out.println("output written to \""+directory_name + "\\" + fileName+".pos");
+				taggedCorpus.writeContentToFile(directory_name + File.separator + fileName+".pos");
+				System.out.println("output written to \""+directory_name + File.separator + fileName+".pos");
 			}
 			System.out.println("done.");
 		} else
